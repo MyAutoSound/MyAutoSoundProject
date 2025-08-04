@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("loading").classList.remove("hidden");
 
-    const response = await fetch("http://localhost:3001/diagnose", {
+    const response = await fetch("https://myautosoundproject.onrender.com", {
       method: "POST",
       body: formData,
     });
