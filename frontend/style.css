@@ -1,0 +1,43 @@
+body {
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
+header {
+  background-color: #003366;
+  color: white;
+  padding: 2rem 1rem;
+}
+main {
+  padding: 2rem;
+}
+audio {
+  margin-top: 0.5rem;
+}
+
+#garageDoor {
+  height: 100%;
+  opacity: 1;
+  transition: height 0.7s ease, opacity 0.7s ease;
+  pointer-events: auto;
+}
+
+#garageDoor.open {
+  height: 0;
+  opacity: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+#diagnosisForm {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+}
+
+#diagnosisForm.open {
+  opacity: 1;
+  pointer-events: auto;
+}

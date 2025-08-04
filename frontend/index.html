@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyAutoSound</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+    }
+
+    button {
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes micSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .fade-slide-up {
+      animation: fadeSlideUp 0.6s ease forwards;
+    }
+
+    @keyframes fadeSlideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-100 bg-opacity-90 text-gray-800">
+
+<!-- Navigation Header -->
+<header class="bg-white shadow-md sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+    <div class="text-xl font-bold text-blue-600">MyAutoSound</div>
+    <nav class="space-x-6 text-sm md:text-base">
+      <a href="#diagnosisForm" class="text-gray-700 hover:text-blue-600">Diagnose</a>
+      <a href="#about" class="text-gray-700 hover:text-blue-600">About</a>
+      <a href="#history" class="text-gray-700 hover:text-blue-600">History</a>
+    <a href="tutorials.html" class="text-gray-700 hover:text-blue-600">Tutorials</a>
+
+    </nav>
+  </div>
+</header>
+
+
+<!-- Hero Section -->
+<section class="relative bg-[url('https://images.unsplash.com/photo-1583126162406-643011b3f69f?q=80&w=1103&auto=format&fit=crop&ixlib=rb-4.1.0')] bg-center bg-no-repeat bg-cover py-28 px-6">
+  <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+
+  <div class="relative z-10 max-w-5xl mx-auto grid md:grid-cols-2 items-center gap-8 text-white">
+    <div>
+      <h1 class="text-3xl md:text-4xl font-extrabold drop-shadow-lg mb-4 fade-slide-up" style="animation-delay: 0.1s">
+        Identify Unusual Car Noises
+      </h1>
+      <p class="text-lg mb-6 drop-shadow fade-slide-up" style="animation-delay: 0.2s">
+        Diagnose potential issues with your vehicle and avoid unnecessary repairs.
+      </p>
+
+      <div class="space-y-6">
+        <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.3s">
+          <span class="text-2xl">👂</span>
+          <p class="drop-shadow"><strong>Describe or record the sound</strong></p>
+        </div>
+        <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.4s">
+          <span class="text-2xl">🔍</span>
+          <p class="drop-shadow"><strong>Get an instant, personalized diagnosis</strong></p>
+        </div>
+        <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.5s">
+          <span class="text-2xl">🛠️</span>
+          <p class="drop-shadow"><strong>Follow easy tutorials to fix or inspect it</strong></p>
+        </div>
+        <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.7s">
+  <span class="text-2xl">🎓</span>
+  <p class="drop-shadow">
+    <a href="tutorials.html" class="text-blue-300 underline hover:text-white">
+      <strong> Fix ourself </strong>
+    </a>
+  </p>
+</div>
+
+        <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.6s">
+  <span class="text-2xl">📍</span>
+  <p class="drop-shadow"><strong>Discover top-rated auto repair shops nearby</strong></p>
+</div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+  <!-- Diagnostic Section -->
+  <section id="diagnose" class="py-16 px-6">
+    <div class="max-w-7xl mx-auto">
+
+      <h2 class="text-3xl font-bold text-center mb-10">Car Sound Diagnostic</h2>
+
+      <form id="diagnosisForm" enctype="multipart/form-data">
+
+        <!-- Step Section with background -->
+        <section
+          class="relative w-full py-12 rounded-3xl overflow-hidden"
+          style="
+            background-image: url('https://images.unsplash.com/photo-1493305457700-d3d24daf8c8c?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+          "
+        >
+          <div class="absolute inset-0 bg-black bg-opacity-40 pointer-events-none"></div>
+
+          <div class="relative px-6 flex flex-col lg:flex-row gap-8 z-10">
+            <!-- Step 1 -->
+            <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
+              <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
+                📝 Step 1 – Describe the Sound
+              </h2>
+
+              <!-- Description -->
+              <div class="mb-6">
+                <label for="textInput" class="block mb-2 font-semibold">Describe the noise:</label>
+                <input
+                  type="text"
+                  id="textInput"
+                  name="description"
+                  placeholder="e.g. squealing when turning"
+                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                />
+              </div>
+
+              <!-- Audio Recording -->
+              <div class="mb-6">
+                <label for="recordButton" class="block mb-2 font-semibold">Record the sound:</label>
+                <button
+                  id="recordButton"
+                  type="button"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
+                >
+                  🎤 Start Recording
+                </button>
+                <audio id="recordedAudio" controls class="hidden mt-4 w-full"></audio>
+                <p id="recordingStatus" class="mt-2 text-sm text-gray-600"></p>
+              </div>
+
+              <!-- File Upload -->
+              <div class="mb-6">
+                <label for="audioFile" class="block mb-2 font-semibold">Choose a file:</label>
+                <input
+                  type="file"
+                  id="audioFile"
+                  name="audio"
+                  accept="audio/*"
+                  class="block w-full text-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-white file:bg-blue-600 hover:file:bg-blue-700"
+                />
+              </div>
+
+              <!-- Example Sounds -->
+              <details class="mt-6">
+                <summary class="cursor-pointer text-blue-700 font-semibold text-lg mb-2">
+                  Example Sounds ▼
+                </summary>
+                <div class="mt-4 space-y-4 max-h-72 overflow-y-auto pr-2">
+                  <!-- Sons exemples -->
+                  <div class="flex items-center space-x-3">
+                    <label class="w-56 font-semibold">Clunking:</label>
+                    <audio controls class="w-full">
+                      <source src="Sounds/AutoSound_Example_Sounds/clunking.mp3" type="audio/mpeg" />
+                    </audio>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <label class="w-56 font-semibold">Squealing:</label>
+                    <audio controls class="w-full">
+                      <source src="Sounds/AutoSound_Example_Sounds/squealing.mp3" type="audio/mpeg" />
+                    </audio>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <label class="w-56 font-semibold">Grinding:</label>
+                    <audio controls class="w-full">
+                      <source src="Sounds/AutoSound_Example_Sounds/grinding.mp3" type="audio/mpeg" />
+                    </audio>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <label class="w-56 font-semibold">Ticking:</label>
+                    <audio controls class="w-full">
+                      <source src="Sounds/AutoSound_Example_Sounds/ticking.mp3" type="audio/mpeg" />
+                    </audio>
+                  </div>
+                  <div class="flex items-center space-x-3">
+                    <label class="w-56 font-semibold">Rattling:</label>
+                    <audio controls class="w-full">
+                      <source src="Sounds/AutoSound_Example_Sounds/rattling.mp3" type="audio/mpeg" />
+                    </audio>
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
+              <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
+                📍 Step 2 – Provide More Details
+              </h2>
+
+              <!-- Location -->
+              <div class="mb-6">
+                <label for="location" class="block mb-2 font-semibold">Where is the sound coming from?</label>
+                <select
+                  id="location"
+                  name="location"
+                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option>Front Left</option>
+                  <option>Front Right</option>
+                  <option>Rear Left</option>
+                  <option>Rear Right</option>
+                  <option>Engine</option>
+                  <option>Under the Car</option>
+                  <option>Dashboard</option>
+                </select>
+              </div>
+
+              <!-- Situation -->
+              <div class="mb-6">
+                <label for="situation" class="block mb-2 font-semibold">When does it happen?</label>
+                <select
+                  id="situation"
+                  name="situation"
+                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                >
+                  <option>At startup</option>
+                  <option>While accelerating</option>
+                  <option>While braking</option>
+                  <option>While turning</option>
+                  <option>At idle</option>
+                  <option>After a speed bump</option>
+                </select>
+              </div>
+
+              <!-- Make & Model -->
+              <div class="mb-6">
+                <label for="makeModel" class="block mb-2 font-semibold">Vehicle make and model:</label>
+                <input
+                  type="text"
+                  id="makeModel"
+                  name="makeModel"
+                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  placeholder="e.g. Toyota Corolla 2016"
+                />
+              </div>
+
+              <!-- Notes -->
+              <div class="mb-6">
+                <label for="notes" class="block mb-2 font-semibold">Any other notes?</label>
+                <textarea
+                  id="notes"
+                  name="notes"
+                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                  placeholder="Optional..."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Submit Button -->
+        <div class="flex justify-center mt-10">
+          <button
+            type="submit"
+            class="bg-blue-600 bg-opacity-80 backdrop-blur-md text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700 hover:bg-opacity-100 hover:scale-105 transform transition duration-300 ease-in-out ring-1 ring-blue-300"
+          >
+            Diagnose
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </section>
+
+  <!-- Loading Indicator -->
+ <div id="loading" class="hidden flex justify-center mt-6">
+  <div class="animate-spin rounded-full h-8 w-8 border-t-4 border-blue-500"></div>
+  <span class="ml-3 text-blue-600 font-medium">Analyzing sound...</span>
+</div>
+
+
+  <!-- AI Diagnosis -->
+  <div id="diagnosisResult" class="mt-10 hidden">
+    <div class="bg-white border border-gray-300 rounded-xl shadow-lg p-6 space-y-4 max-w-3xl mx-auto">
+      <h2 class="text-2xl font-semibold flex items-center gap-2">🧠 AI Diagnosis</h2>
+      <p id="diagnosisTimestamp" class="text-sm text-gray-500 flex items-center gap-2">
+        ⏱️ <span id="timestampText">Now</span>
+      </p>
+      <div id="diagnosisContent" class="text-gray-800 leading-relaxed whitespace-pre-wrap"></div>
+      <div id="diagnosisSuggestions" class="mt-4"></div>
+    </div>
+  </div>
+
+  <!-- Diagnosis History -->
+  <div class="mt-10 max-w-3xl mx-auto">
+    <details class="bg-white shadow-md rounded-lg p-4">
+      <summary class="cursor-pointer text-blue-700 font-semibold text-lg hover:underline">
+        View past diagnoses
+      </summary>
+      <div class="flex justify-end mb-2">
+  <button id="clearHistoryButton" class="text-red-600 hover:underline text-sm">
+    🗑️ Clear History
+  </button>
+</div>
+    <div id="historyList" class="mt-4 text-sm text-gray-800 space-y-4"></div>
+    </details>
+  </div>
+
+  <script src="script.js"></script>
+</div>
+
+  <!-- About Section -->
+<section id="about" class="bg-white py-12 border-t border-gray-200 mt-24">
+  <div class="max-w-4xl mx-auto px-4 text-center">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">About MyAutoSound</h2>
+    <p class="text-gray-600 leading-relaxed">
+      MyAutoSound is a diagnostic assistant created to help car owners better understand strange vehicle sounds.
+      Whether it's a squeak, knock, or rattle, our goal is to guide users toward possible causes and solutions.
+    </p>
+    <p class="text-gray-600 mt-4 leading-relaxed">
+      This project was built with passion for automotive problem-solving and modern web technology. Our mission is to make car diagnostics more accessible and intuitive for everyone.
+    </p>
+  </div>
+</section>
+<!-- Garages Near Me Section -->
+<section id="findGarages" class="py-20 bg-white border-t border-gray-200">
+  <div class="max-w-5xl mx-auto px-4 text-center">
+    <h2 class="text-2xl font-bold text-gray-800 mb-4">Discover top-rated auto repair shops nearby</h2>
+    <p class="text-gray-600 mb-6">Use your location to find trusted mechanics around you.</p>
+
+    <button
+      id="findGaragesBtn"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition"
+    >
+      🔍 Find garages near me
+    </button>
+
+    <div id="map" class="mt-8 w-full h-[500px] rounded-lg shadow-md"></div>
+
+    <div id="garageList" class="mt-10 text-left space-y-4 max-w-3xl mx-auto"></div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-gray-100 text-gray-600 text-sm py-6 mt-20 border-t">
+  <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+    <p>&copy; 2025 MyAutoSound. All rights reserved.</p>
+    <div class="mt-2 md:mt-0">
+      <a href="mailto:contact@myautosound.com" class="hover:underline hover:text-blue-600">
+        ✉️ Contact us: contact@myautosound.com
+      </a>
+    </div>
+  </div>
+</footer>
+
+<!-- ✅ API GOOGLE MAPS -->
+<script>
+  let map;
+
+  async function initMap() {
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: 45.5017, lng: -73.5673 },
+      zoom: 13,
+    });
+  }
+
+  function calculateDistance(origin, destination) {
+    const R = 6371e3; // Earth radius in meters
+    const φ1 = origin.lat * Math.PI/180;
+    const φ2 = destination.lat() * Math.PI/180;
+    const Δφ = (destination.lat() - origin.lat) * Math.PI/180;
+    const Δλ = (destination.lng() - origin.lng) * Math.PI/180;
+
+    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+              Math.cos(φ1) * Math.cos(φ2) *
+              Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    return R * c / 1000; // distance in kilometers
+  }
+
+  document.getElementById("findGaragesBtn").addEventListener("click", async () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const userLocation = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+
+        map.setCenter(userLocation);
+
+        const service = new google.maps.places.PlacesService(map);
+
+        const request = {
+          location: userLocation,
+          radius: 10000,
+        type: "car_repair",
+  keyword: "garage"
+};
+        service.nearbySearch(request, (results, status) => {
+          const garageList = document.getElementById("garageList");
+          garageList.innerHTML = "";
+
+          if (status === google.maps.places.PlacesServiceStatus.OK) {
+            const prioritized = results
+              .map((place) => {
+                const distance = calculateDistance(userLocation, place.geometry.location);
+                const name = place.name.toLowerCase();
+                const hasGarageKeyword = name.includes("garage") || name.includes("atelier");
+                return { ...place, distance, hasGarageKeyword };
+              })
+              .sort((a, b) => {
+                if (a.hasGarageKeyword !== b.hasGarageKeyword) {
+                  return b.hasGarageKeyword - a.hasGarageKeyword;
+                }
+                return a.distance - b.distance;
+              });
+
+            prioritized.forEach((place) => {
+              new google.maps.Marker({
+                position: place.geometry.location,
+                map,
+                title: place.name,
+              });
+
+              const name = place.name;
+              const address = place.vicinity || "Address not available";
+              const rating = place.rating ? `⭐ ${place.rating}/5` : "No rating";
+              const distance = place.distance.toFixed(1);
+              const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
+
+              const div = document.createElement("div");
+              div.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
+              div.innerHTML = `
+                <h3 class="text-lg font-semibold text-blue-700">${name}</h3>
+                <p class="text-sm text-gray-700">${address}</p>
+                <p class="text-sm text-gray-700">${rating}</p>
+                <p class="text-sm text-gray-600">📍 ${distance} km away</p>
+                <a href="${mapLink}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
+              `;
+              garageList.appendChild(div);
+            });
+
+            if (prioritized.length === 0) {
+              garageList.innerHTML = `<p class="text-gray-600 text-center">No open garages found near you.</p>`;
+            }
+          } else {
+            console.error("PlacesService failed:", status);
+            alert("An error occurred while fetching nearby garages.");
+          }
+        });
+      }, () => {
+        alert("Unable to retrieve your location. Please allow location access.");
+      });
+    } else {
+      alert("Geolocation not supported by this browser.");
+    }
+  });
+</script>
+
+
+<!-- 🔑 Clé API avec callback -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&libraries=places&callback=initMap"
+  async
+  defer
+></script>
