@@ -127,6 +127,7 @@
     "type": "pdf",
     "category": "brake",
     "description": "Understand the signs of severe brake wear and rotor damage.",
+    "thumb": "assets/img/PDF.jpg",
     "pdfUrl": "tutorial_pdfs/grinding.pdf"
   },
   {
