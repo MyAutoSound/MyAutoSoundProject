@@ -60,12 +60,10 @@
       <a href="#diagnosisForm" class="text-gray-700 hover:text-blue-600">Diagnose</a>
       <a href="#about" class="text-gray-700 hover:text-blue-600">About</a>
       <a href="#history" class="text-gray-700 hover:text-blue-600">History</a>
-    <a href="tutorials.html" class="text-gray-700 hover:text-blue-600">Tutorials</a>
-
+      <a href="tutorials.html" class="text-gray-700 hover:text-blue-600">Tutorials</a>
     </nav>
   </div>
 </header>
-
 
 <!-- Hero Section -->
 <section class="relative bg-[url('https://images.unsplash.com/photo-1583126162406-643011b3f69f?q=80&w=1103&auto=format&fit=crop&ixlib=rb-4.1.0')] bg-center bg-no-repeat bg-cover py-28 px-6">
@@ -94,25 +92,24 @@
           <p class="drop-shadow"><strong>Follow easy tutorials to fix or inspect it</strong></p>
         </div>
         <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.7s">
-  <span class="text-2xl">🎓</span>
-  <p class="drop-shadow">
-    <a href="tutorials.html" class="text-blue-300 underline hover:text-white">
-      <strong> Fix ourself </strong>
-    </a>
-  </p>
-</div>
+          <span class="text-2xl">🎓</span>
+          <p class="drop-shadow">
+            <a href="tutorials.html" class="text-blue-300 underline hover:text-white">
+              <strong> Fix ourself </strong>
+            </a>
+          </p>
+        </div>
 
         <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.6s">
-  <span class="text-2xl">📍</span>
-  <p class="drop-shadow"><strong>Discover top-rated auto repair shops nearby</strong></p>
-</div>
-
+          <span class="text-2xl">📍</span>
+          <p class="drop-shadow"><strong>Discover top-rated auto repair shops nearby</strong></p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 🛈 Diagnostic Tips -->
+<!-- 🛈 Diagnostic Tips (added) -->
 <section class="max-w-4xl mx-auto bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-md shadow mb-8 mt-12">
   <h2 class="text-xl font-bold text-yellow-800 mb-2">💡 How to Get the Most Accurate Diagnosis</h2>
   <ul class="list-disc list-inside text-gray-700 space-y-1">
@@ -124,231 +121,240 @@
   </ul>
 </section>
 
-  <!-- Diagnostic Section -->
-  <section id="diagnose" class="py-16 px-6">
-    <div class="max-w-7xl mx-auto">
+<!-- Diagnostic Section -->
+<section id="diagnose" class="py-16 px-6">
+  <div class="max-w-7xl mx-auto">
 
-      <h2 class="text-3xl font-bold text-center mb-10">Car Sound Diagnostic</h2>
+    <h2 class="text-3xl font-bold text-center mb-10">Car Sound Diagnostic</h2>
 
-      <form id="diagnosisForm" enctype="multipart/form-data">
+    <form id="diagnosisForm" enctype="multipart/form-data">
 
-        <!-- Step Section with background -->
-        <section
-          class="relative w-full py-12 rounded-3xl overflow-hidden"
-          style="
-            background-image: url('https://images.unsplash.com/photo-1493305457700-d3d24daf8c8c?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-          "
-        >
-          <div class="absolute inset-0 bg-black bg-opacity-40 pointer-events-none"></div>
+      <!-- Step Section with background -->
+      <section
+        class="relative w-full py-12 rounded-3xl overflow-hidden"
+        style="
+          background-image: url('https://images.unsplash.com/photo-1493305457700-d3d24daf8c8c?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+        "
+      >
+        <div class="absolute inset-0 bg-black bg-opacity-40 pointer-events-none"></div>
 
-          <div class="relative px-6 flex flex-col lg:flex-row gap-8 z-10">
-            <!-- Step 1 -->
-            <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
-              <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
-                📝 Step 1 – Describe the Sound
-              </h2>
+        <div class="relative px-6 flex flex-col lg:flex-row gap-8 z-10">
+          <!-- Step 1 -->
+          <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
+              📝 Step 1 – Describe the Sound
+            </h2>
 
-              <!-- Description -->
-              <div class="mb-6">
-                <label for="textInput" class="block mb-2 font-semibold">Describe the noise:</label>
-                <input
-                  type="text"
-                  id="textInput"
-                  name="description"
-                  placeholder="e.g. squealing when turning"
-                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                />
-              </div>
-
-              <!-- Audio Recording -->
-              <div class="mb-6">
-                <label for="recordButton" class="block mb-2 font-semibold">Record the sound:</label>
-                <button
-                  id="recordButton"
-                  type="button"
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-                >
-                  🎤 Start Recording
-                </button>
-                <audio id="recordedAudio" controls class="hidden mt-4 w-full"></audio>
-                <p id="recordingStatus" class="mt-2 text-sm text-gray-600"></p>
-              </div>
-
-              <!-- File Upload -->
-              <div class="mb-6">
-                <label for="audioFile" class="block mb-2 font-semibold">Choose a file:</label>
-                <input
-                  type="file"
-                  id="audioFile"
-                  name="audio"
-                  accept="audio/*"
-                  class="block w-full text-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-white file:bg-blue-600 hover:file:bg-blue-700"
-                />
-              </div>
-
-              <!-- Example Sounds -->
-              <details class="mt-6">
-                <summary class="cursor-pointer text-blue-700 font-semibold text-lg mb-2">
-                  Example Sounds ▼
-                </summary>
-                <div class="mt-4 space-y-4 max-h-72 overflow-y-auto pr-2">
-                  <!-- Sons exemples -->
-                  <div class="flex items-center space-x-3">
-                    <label class="w-56 font-semibold">Clunking:</label>
-                    <audio controls class="w-full">
-                      <source src="Sounds/AutoSound_Example_Sounds/clunking.mp3" type="audio/mpeg" />
-                    </audio>
-                  </div>
-                  <div class="flex items-center space-x-3">
-                    <label class="w-56 font-semibold">Squealing:</label>
-                    <audio controls class="w-full">
-                      <source src="Sounds/AutoSound_Example_Sounds/squealing.mp3" type="audio/mpeg" />
-                    </audio>
-                  </div>
-                  <div class="flex items-center space-x-3">
-                    <label class="w-56 font-semibold">Grinding:</label>
-                    <audio controls class="w-full">
-                      <source src="Sounds/AutoSound_Example_Sounds/grinding.mp3" type="audio/mpeg" />
-                    </audio>
-                  </div>
-                  <div class="flex items-center space-x-3">
-                    <label class="w-56 font-semibold">Ticking:</label>
-                    <audio controls class="w-full">
-                      <source src="Sounds/AutoSound_Example_Sounds/ticking.mp3" type="audio/mpeg" />
-                    </audio>
-                  </div>
-                  <div class="flex items-center space-x-3">
-                    <label class="w-56 font-semibold">Rattling:</label>
-                    <audio controls class="w-full">
-                      <source src="Sounds/AutoSound_Example_Sounds/rattling.mp3" type="audio/mpeg" />
-                    </audio>
-                  </div>
-                </div>
-              </details>
+            <!-- Description -->
+            <div class="mb-6">
+              <label for="textInput" class="block mb-2 font-semibold">Describe the noise:</label>
+              <input
+                type="text"
+                id="textInput"
+                name="description"
+                placeholder="e.g. squealing when turning"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
             </div>
 
-            <!-- Step 2 -->
-            <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
-              <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
-                📍 Step 2 – Provide More Details
-              </h2>
+            <!-- Audio Recording -->
+            <div class="mb-6">
+              <label for="recordButton" class="block mb-2 font-semibold">Record the sound:</label>
+              <button
+                id="recordButton"
+                type="button"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
+              >
+                🎤 Start Recording
+              </button>
+              <audio id="recordedAudio" controls class="hidden mt-4 w-full"></audio>
+              <p id="recordingStatus" class="mt-2 text-sm text-gray-600"></p>
+            </div>
 
-              <!-- Location -->
-              <div class="mb-6">
-                <label for="location" class="block mb-2 font-semibold">Where is the sound coming from?</label>
-                <select
-                  id="location"
-                  name="location"
-                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                >
-                  <option>Front Left</option>
-                  <option>Front Right</option>
-                  <option>Rear Left</option>
-                  <option>Rear Right</option>
-                  <option>Engine</option>
-                  <option>Under the Car</option>
-                  <option>Dashboard</option>
-                </select>
-              </div>
+            <!-- File Upload -->
+            <div class="mb-6">
+              <label for="audioFile" class="block mb-2 font-semibold">Choose a file:</label>
+              <input
+                type="file"
+                id="audioFile"
+                name="audio"
+                accept="audio/*"
+                class="block w-full text-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-white file:bg-blue-600 hover:file:bg-blue-700"
+              />
+            </div>
 
-              <!-- Situation -->
-              <div class="mb-6">
-                <label for="situation" class="block mb-2 font-semibold">When does it happen?</label>
-                <select
-                  id="situation"
-                  name="situation"
-                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                >
-                  <option>At startup</option>
-                  <option>While accelerating</option>
-                  <option>While braking</option>
-                  <option>While turning</option>
-                  <option>At idle</option>
-                  <option>After a speed bump</option>
-                </select>
+            <!-- Example Sounds -->
+            <details class="mt-6">
+              <summary class="cursor-pointer text-blue-700 font-semibold text-lg mb-2">
+                Example Sounds ▼
+              </summary>
+              <div class="mt-4 space-y-4 max-h-72 overflow-y-auto pr-2">
+                <!-- Sons exemples -->
+                <div class="flex items-center space-x-3">
+                  <label class="w-56 font-semibold">Clunking:</label>
+                  <audio controls class="w-full">
+                    <source src="Sounds/AutoSound_Example_Sounds/clunking.mp3" type="audio/mpeg" />
+                  </audio>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <label class="w-56 font-semibold">Squealing:</label>
+                  <audio controls class="w-full">
+                    <source src="Sounds/AutoSound_Example_Sounds/squealing.mp3" type="audio/mpeg" />
+                  </audio>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <label class="w-56 font-semibold">Grinding:</label>
+                  <audio controls class="w-full">
+                    <source src="Sounds/AutoSound_Example_Sounds/grinding.mp3" type="audio/mpeg" />
+                  </audio>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <label class="w-56 font-semibold">Ticking:</label>
+                  <audio controls class="w-full">
+                    <source src="Sounds/AutoSound_Example_Sounds/ticking.mp3" type="audio/mpeg" />
+                  </audio>
+                </div>
+                <div class="flex items-center space-x-3">
+                  <label class="w-56 font-semibold">Rattling:</label>
+                  <audio controls class="w-full">
+                    <source src="Sounds/AutoSound_Example_Sounds/rattling.mp3" type="audio/mpeg" />
+                  </audio>
+                </div>
               </div>
+            </details>
+          </div>
 
-              <!-- Make & Model -->
-              <div class="mb-6">
-                <label for="makeModel" class="block mb-2 font-semibold">Vehicle make and model:</label>
-                <input
-                  type="text"
-                  id="makeModel"
-                  name="makeModel"
-                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                  placeholder="e.g. Toyota Corolla 2016"
-                />
-              </div>
+          <!-- Step 2 -->
+          <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
+              📍 Step 2 – Provide More Details
+            </h2>
 
-              <!-- Notes -->
-              <div class="mb-6">
-                <label for="notes" class="block mb-2 font-semibold">Any other notes?</label>
-                <textarea
-                  id="notes"
-                  name="notes"
-                  class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
-                  placeholder="Optional..."
-                ></textarea>
-              </div>
+            <!-- Location -->
+            <div class="mb-6">
+              <label for="location" class="block mb-2 font-semibold">Where is the sound coming from?</label>
+              <select
+                id="location"
+                name="location"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <option>Front Left</option>
+                <option>Front Right</option>
+                <option>Rear Left</option>
+                <option>Rear Right</option>
+                <option>Engine</option>
+                <option>Under the Car</option>
+                <option>Dashboard</option>
+              </select>
+            </div>
+
+            <!-- Situation -->
+            <div class="mb-6">
+              <label for="situation" class="block mb-2 font-semibold">When does it happen?</label>
+              <select
+                id="situation"
+                name="situation"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                <option>At startup</option>
+                <option>While accelerating</option>
+                <option>While braking</option>
+                <option>While turning</option>
+                <option>At idle</option>
+                <option>After a speed bump</option>
+              </select>
+            </div>
+
+            <!-- Make & Model -->
+            <div class="mb-6">
+              <label for="makeModel" class="block mb-2 font-semibold">Vehicle make and model:</label>
+              <input
+                type="text"
+                id="makeModel"
+                name="makeModel"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="e.g. Toyota Corolla 2016"
+              />
+            </div>
+
+            <!-- Notes -->
+            <div class="mb-6">
+              <label for="notes" class="block mb-2 font-semibold">Any other notes?</label>
+              <textarea
+                id="notes"
+                name="notes"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                placeholder="Optional..."
+              ></textarea>
             </div>
           </div>
-        </section>
-
-        <!-- Submit Button -->
-        <div class="flex justify-center mt-10">
-          <button
-            type="submit"
-            class="bg-blue-600 bg-opacity-80 backdrop-blur-md text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700 hover:bg-opacity-100 hover:scale-105 transform transition duration-300 ease-in-out ring-1 ring-blue-300"
-          >
-            Diagnose
-          </button>
         </div>
+      </section>
 
-      </form>
-    </div>
-  </section>
+      <!-- Draft status + clear (added) -->
+      <div class="mt-6 flex items-center justify-between">
+        <p id="draftStatus" class="text-sm text-gray-500">
+          Drafts auto-save locally as you type.
+        </p>
+        <button type="button" id="clearDraftBtn" class="text-sm text-blue-600 hover:underline">
+          Clear draft
+        </button>
+      </div>
 
-  <!-- Loading Indicator -->
- <div id="loading" class="hidden flex justify-center mt-6">
+      <!-- Submit Button -->
+      <div class="flex justify-center mt-10">
+        <button
+          type="submit"
+          class="bg-blue-600 bg-opacity-80 backdrop-blur-md text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700 hover:bg-opacity-100 hover:scale-105 transform transition duration-300 ease-in-out ring-1 ring-blue-300"
+        >
+          Diagnose
+        </button>
+      </div>
+
+    </form>
+  </div>
+</section>
+
+<!-- Loading Indicator -->
+<div id="loading" class="hidden flex justify-center mt-6">
   <div class="animate-spin rounded-full h-8 w-8 border-t-4 border-blue-500"></div>
   <span class="ml-3 text-blue-600 font-medium">Analyzing sound...</span>
 </div>
 
+<!-- AI Diagnosis -->
+<div id="diagnosisResult" class="mt-10 hidden">
+  <div class="bg-white border border-gray-300 rounded-xl shadow-lg p-6 space-y-4 max-w-3xl mx-auto">
+    <h2 class="text-2xl font-semibold flex items-center gap-2">🧠 AI Diagnosis</h2>
+    <p id="diagnosisTimestamp" class="text-sm text-gray-500 flex items-center gap-2">
+      ⏱️ <span id="timestampText">Now</span>
+    </p>
+    <div id="diagnosisContent" class="text-gray-800 leading-relaxed whitespace-pre-wrap"></div>
+    <div id="diagnosisSuggestions" class="mt-4"></div>
+  </div>
+</div>
 
-  <!-- AI Diagnosis -->
-  <div id="diagnosisResult" class="mt-10 hidden">
-    <div class="bg-white border border-gray-300 rounded-xl shadow-lg p-6 space-y-4 max-w-3xl mx-auto">
-      <h2 class="text-2xl font-semibold flex items-center gap-2">🧠 AI Diagnosis</h2>
-      <p id="diagnosisTimestamp" class="text-sm text-gray-500 flex items-center gap-2">
-        ⏱️ <span id="timestampText">Now</span>
-      </p>
-      <div id="diagnosisContent" class="text-gray-800 leading-relaxed whitespace-pre-wrap"></div>
-      <div id="diagnosisSuggestions" class="mt-4"></div>
+<!-- Diagnosis History -->
+<div class="mt-10 max-w-3xl mx-auto">
+  <details class="bg-white shadow-md rounded-lg p-4">
+    <summary class="cursor-pointer text-blue-700 font-semibold text-lg hover:underline">
+      View past diagnoses
+    </summary>
+    <div class="flex justify-end mb-2">
+      <button id="clearHistoryButton" class="text-red-600 hover:underline text-sm">
+        🗑️ Clear History
+      </button>
     </div>
-  </div>
-
-  <!-- Diagnosis History -->
-  <div class="mt-10 max-w-3xl mx-auto">
-    <details class="bg-white shadow-md rounded-lg p-4">
-      <summary class="cursor-pointer text-blue-700 font-semibold text-lg hover:underline">
-        View past diagnoses
-      </summary>
-      <div class="flex justify-end mb-2">
-  <button id="clearHistoryButton" class="text-red-600 hover:underline text-sm">
-    🗑️ Clear History
-  </button>
-</div>
     <div id="historyList" class="mt-4 text-sm text-gray-800 space-y-4"></div>
-    </details>
-  </div>
-
-  <script src="script.js"></script>
+  </details>
 </div>
 
-  <!-- About Section -->
+<script src="script.js"></script>
+</div>
+
+<!-- About Section -->
 <section id="about" class="bg-white py-12 border-t border-gray-200 mt-24">
   <div class="max-w-4xl mx-auto px-4 text-center">
     <h2 class="text-2xl font-bold text-gray-800 mb-4">About MyAutoSound</h2>
@@ -361,6 +367,7 @@
     </p>
   </div>
 </section>
+
 <!-- Garages Near Me Section -->
 <section id="findGarages" class="py-20 bg-white border-t border-gray-200">
   <div class="max-w-5xl mx-auto px-4 text-center">
@@ -433,9 +440,9 @@
         const request = {
           location: userLocation,
           radius: 10000,
-        type: "car_repair",
-  keyword: "garage"
-};
+          type: "car_repair",
+          keyword: "garage"
+        };
         service.nearbySearch(request, (results, status) => {
           const garageList = document.getElementById("garageList");
           garageList.innerHTML = "";
@@ -497,13 +504,13 @@
   });
 </script>
 
-
 <!-- 🔑 Clé API avec callback -->
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&libraries=places&callback=initMap"
   async
   defer
 ></script>
+
 <!-- 🛡️ Consent Banner -->
 <div id="consent-banner" class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-300 p-4 shadow-lg z-50">
   <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm text-gray-800">
@@ -556,12 +563,12 @@
     document.head.appendChild(script2);
   }
 </script>
+
 <!-- Beta toast message -->
 <div id="betaToast" class="fixed bottom-4 right-4 bg-yellow-200 text-yellow-900 p-4 rounded-xl shadow-xl text-sm max-w-xs z-50 border border-yellow-400">
   <div class="font-semibold mb-1">🚧 Beta Notice</div>
   This site is currently in <strong>beta</strong>. Some features may be incomplete or unstable.
 </div>
-
 <script>
   // Auto-hide the toast after 6 seconds
   setTimeout(() => {
@@ -570,5 +577,94 @@
   }, 6000);
 </script>
 
+<!-- 🧠 Auto-save draft (localStorage) -->
+<script>
+(() => {
+  const DRAFT_KEY = "mas_draft_v1";
+  const form = document.getElementById("diagnosisForm");
+  if (!form) return;
+
+  const fields = {
+    textInput: document.getElementById("textInput"),
+    location: document.getElementById("location"),
+    situation: document.getElementById("situation"),
+    makeModel: document.getElementById("makeModel"),
+    notes: document.getElementById("notes"),
+    // audioFile intentionally ignored (privacy + size)
+  };
+
+  const statusEl = document.getElementById("draftStatus");
+  const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg; };
+
+  const setSelectIfOptionExists = (selectEl, value) => {
+    if (!selectEl || !value) return;
+    const ok = Array.from(selectEl.options).some(o => (o.value || o.textContent) === value);
+    if (ok) selectEl.value = value;
+  };
+
+  function loadDraft() {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+
+      if (fields.textInput) fields.textInput.value = d.description || "";
+      setSelectIfOptionExists(fields.location, d.location);
+      setSelectIfOptionExists(fields.situation, d.situation);
+      if (fields.makeModel) fields.makeModel.value = d.makeModel || "";
+      if (fields.notes) fields.notes.value = d.notes || "";
+
+      setStatus("Draft restored.");
+    } catch (_) {}
+  }
+
+  let saveTimer;
+  function scheduleSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveDraft, 500); // debounce
+  }
+
+  function saveDraft() {
+    try {
+      const data = {
+        description: fields.textInput?.value || "",
+        location: fields.location?.value || "",
+        situation: fields.situation?.value || "",
+        makeModel: fields.makeModel?.value || "",
+        notes: fields.notes?.value || "",
+        ts: Date.now()
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+      setStatus("Draft saved.");
+    } catch (_) {}
+  }
+
+  function clearDraft() {
+    try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+    form.reset();
+    setStatus("Draft cleared.");
+  }
+
+  // Listen to changes
+  Object.values(fields).forEach(el => {
+    if (!el) return;
+    el.addEventListener("input", scheduleSave);
+    el.addEventListener("change", scheduleSave);
+  });
+
+  // Clear button
+  document.getElementById("clearDraftBtn")?.addEventListener("click", clearDraft);
+
+  // Clean draft on submit
+  form.addEventListener("submit", () => {
+    try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+  });
+
+  // Init
+  loadDraft();
+})();
+</script>
+
 </body>
 </html>
+
