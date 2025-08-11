@@ -6,9 +6,7 @@
   <title>MyAutoSound Tutorials</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      font-family: 'Poppins', sans-serif;
-    }
+    body { font-family: 'Poppins', sans-serif; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
@@ -48,21 +46,29 @@
 
     <!-- 🎥 Video Tutorials -->
     <h2 class="text-2xl font-bold text-blue-800 mt-12 mb-6">🎥 Video Tutorials</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="videoSection">
-      <!-- Tous les tutoriels vidéo seront injectés ici via JS -->
-    </div>
+
+    <!-- 🔧 Fix it at home -->
+    <h3 class="text-xl font-bold text-blue-700 mt-8 mb-4">🔧 Fix it at home</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="videoFix"></div>
+
+    <!-- 👂 Inspect your car noise -->
+    <h3 class="text-xl font-bold text-blue-700 mt-8 mb-4">👂 Inspect your car noise</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="videoInspect"></div>
+
+    <!-- 🧼 Car maintenance you should do at home -->
+    <h3 class="text-xl font-bold text-blue-700 mt-8 mb-4">🧼 Car maintenance you should do at home</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="videoMaintenance"></div>
 
     <!-- 🔉 Audio Examples -->
     <h2 class="text-2xl font-bold text-blue-800 mt-12 mb-6">🔉 Sound Examples</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="audioSection">
-      <!-- Tous les tutoriels audio seront injectés ici via JS -->
+      <!-- Injected by JS -->
     </div>
 
     <!-- 📄 PDF Guides -->
     <h2 class="text-2xl font-bold text-blue-800 mt-12 mb-6">📄 PDF Guides</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="pdfSection">
-      <!-- Tous les tutoriels PDF seront injectés ici via JS -->
-       
+      <!-- Injected by JS -->
     </div>
   </section>
 
@@ -70,219 +76,213 @@
   <footer class="bg-white border-t border-gray-200 text-center text-sm text-gray-600 py-6 mt-10">
     &copy; 2025 MyAutoSound. All rights reserved.
   </footer>
-<!-- 🎥 Video - Brake -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="brake" data-type="video">
-  <img src="assets/img/brake.jpg" alt="Brake Tutorial" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">How to Replace Brake Pads</h2>
-    <p class="text-sm text-gray-600 mb-3">A quick video on safely changing brake pads at home.</p>
-    <a href="public/Sounds/frein_changement.mp4" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition">🎥 Watch Video</a>
-  </div>
-</div>
 
-<!-- 🔉 Audio - Engine -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="audio">
-  <img src="assets/img/KnockingEngine.jpg" alt="Knocking engine" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Engine Knocking</h2>
-    <p class="text-sm text-gray-600 mb-3">Listen to this knocking engine sound and compare it to yours.</p>
-    <audio controls class="w-full"><source src="public/Sounds/example_sounds/engine_knocking.mp3" type="audio/mpeg" /></audio>
-  </div>
-</div>
+  <!-- ===== Tutorial Cards (place them before the script) ===== -->
 
-<!-- 📄 PDF - Suspension -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="suspension" data-type="pdf">
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Clunking in Suspension</h2>
-    <p class="text-sm text-gray-600 mb-3">This guide explains common causes of clunking under the car.</p>
-    <a href="tutorial_pdfs/clunking.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+  <!-- 🎥 Video - Brake (YouTube) -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col"
+       data-category="brake" data-type="video" data-vgroup="fix">
+    <img src="assets/img/brake.jpg" alt="Brake Tutorial" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">How to Replace Brake Pads</h2>
+      <p class="text-sm text-gray-600 mb-3">A quick video on safely changing brake pads at home.</p>
+      <!-- Remplace VIDEO_ID par ton ID YouTube -->
+      <a href="https://www.youtube.com/watch?v=VIDEO_ID" target="_blank" rel="noopener"
+         class="bg-red-600 text-white px-4 py-2 rounded text-sm w-fit hover:bg-red-700 transition">▶️ Watch on YouTube</a>
+    </div>
   </div>
-</div>
 
-<!-- 🔉 Audio - Brake -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="brake" data-type="audio">
-  <img src="assets/img/Squealingbrakepads.jpg" alt="Squealing brakes" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Squealing Brake Pads</h2>
-    <p class="text-sm text-gray-600 mb-3">Squealing often means worn pads or metal-on-metal contact.</p>
-    <audio controls class="w-full"><source src="public/Sounds/squealing_brakes.mp3" type="audio/mpeg" /></audio>
+  <!-- 🔉 Audio - Engine -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="audio">
+    <img src="assets/img/KnockingEngine.jpg" alt="Knocking engine" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Engine Knocking</h2>
+      <p class="text-sm text-gray-600 mb-3">Listen to this knocking engine sound and compare it to yours.</p>
+      <audio controls class="w-full"><source src="public/Sounds/example_sounds/engine_knocking.mp3" type="audio/mpeg" /></audio>
+    </div>
   </div>
-</div>
 
-<!-- 📄 PDF - Engine -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="pdf">
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Ticking from Valve Lifters</h2>
-    <p class="text-sm text-gray-600 mb-3">PDF guide for diagnosing ticking noises related to valve lifters.</p>
-    <a href="tutorial_pdfs/ticking.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+  <!-- 📄 PDF - Suspension -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="suspension" data-type="pdf">
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Clunking in Suspension</h2>
+      <p class="text-sm text-gray-600 mb-3">This guide explains common causes of clunking under the car.</p>
+      <a href="tutorial_pdfs/clunking.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+    </div>
   </div>
-</div>
 
-<!-- 🎥 Video - Steering -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="steering" data-type="video">
-  <img src="assets/img/steering.jpg" alt="Steering tutorial" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Steering Noise Causes</h2>
-    <p class="text-sm text-gray-600 mb-3">Video on diagnosing power steering whining and groaning sounds.</p>
-    <a href="public/Sounds/steering_guide.mp4" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition">🎥 Watch Video</a>
+  <!-- 🔉 Audio - Brake -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="brake" data-type="audio">
+    <img src="assets/img/Squealingbrakepads.jpg" alt="Squealing brakes" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Squealing Brake Pads</h2>
+      <p class="text-sm text-gray-600 mb-3">Squealing often means worn pads or metal-on-metal contact.</p>
+      <audio controls class="w-full"><source src="public/Sounds/squealing_brakes.mp3" type="audio/mpeg" /></audio>
+    </div>
   </div>
-</div>
 
-<!-- 🔉 Audio - Exhaust -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="exhaust" data-type="audio">
-  <img src="assets/img/Looserattlingmuffler.jpg" alt="Rattling muffler" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Rattling Muffler</h2>
-    <p class="text-sm text-gray-600 mb-3">Sound of a loose or rusted muffler shaking under the car.</p>
-    <audio controls class="w-full"><source src="public/Sounds/rattling_muffler.mp3" type="audio/mpeg" /></audio>
+  <!-- 📄 PDF - Engine -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="pdf">
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Ticking from Valve Lifters</h2>
+      <p class="text-sm text-gray-600 mb-3">PDF guide for diagnosing ticking noises related to valve lifters.</p>
+      <a href="tutorial_pdfs/ticking.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+    </div>
   </div>
-</div>
 
-<!-- 🔉 Audio - Vacuum -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="vacuum" data-type="audio">
-  <img src="assets/img/default-sound.jpg" alt="Vacuum leak" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Hissing from Vacuum Leak</h2>
-    <p class="text-sm text-gray-600 mb-3">Listen to this classic vacuum leak hissing sound example.</p>
-    <audio controls class="w-full"><source src="public/Sounds/hissing_vacuum_leak.mp3" type="audio/mpeg" /></audio>
+  <!-- 🎥 Video - Steering (YouTube) -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col"
+       data-category="steering" data-type="video" data-vgroup="inspect">
+    <img src="assets/img/steering.jpg" alt="Steering tutorial" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Steering Noise Causes</h2>
+      <p class="text-sm text-gray-600 mb-3">Diagnose power steering whining and groaning sounds.</p>
+      <a href="https://www.youtube.com/watch?v=VIDEO_ID" target="_blank" rel="noopener"
+         class="bg-red-600 text-white px-4 py-2 rounded text-sm w-fit hover:bg-red-700 transition">▶️ Watch on YouTube</a>
+    </div>
   </div>
-</div>
 
-<!-- 🎥 Video - Engine -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="video">
-  <img src="assets/img/Whistlingairintake.jpg" alt="Whistling air intake" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Air Intake Whistle</h2>
-    <p class="text-sm text-gray-600 mb-3">Watch how air leaks around the intake can create whistling sounds.</p>
-    <a href="public/Sounds/whistle_demo.mp4" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition">🎥 Watch Video</a>
+  <!-- 🔉 Audio - Exhaust -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="exhaust" data-type="audio">
+    <img src="assets/img/Looserattlingmuffler.jpg" alt="Rattling muffler" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Rattling Muffler</h2>
+      <p class="text-sm text-gray-600 mb-3">Sound of a loose or rusted muffler shaking under the car.</p>
+      <audio controls class="w-full"><source src="public/Sounds/rattling_muffler.mp3" type="audio/mpeg" /></audio>
+    </div>
   </div>
-</div>
-<!-- 🔉 Audio - Drivetrain -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="drivetrain" data-type="audio">
-  <img src="assets/img/ClickingCVaxle.jpg" alt="Clicking CV axle" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Clicking CV Axle</h2>
-    <p class="text-sm text-gray-600 mb-3">CV joints often click when turning if they're worn out.</p>
-    <audio controls class="w-full"><source src="public/Sounds/clicking_axle.mp3" type="audio/mpeg" /></audio>
-  </div>
-</div>
 
-<!-- 📄 PDF - Steering -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="steering" data-type="pdf">
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Steering Noises (PDF)</h2>
-    <p class="text-sm text-gray-600 mb-3">Guide to diagnose groaning or whining sounds in steering systems.</p>
-    <a href="tutorial_pdfs/steering.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+  <!-- 🔉 Audio - Vacuum -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="vacuum" data-type="audio">
+    <img src="assets/img/default-sound.jpg" alt="Vacuum leak" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Hissing from Vacuum Leak</h2>
+      <p class="text-sm text-gray-600 mb-3">Listen to this classic vacuum leak hissing sound example.</p>
+      <audio controls class="w-full"><source src="public/Sounds/hissing_vacuum_leak.mp3" type="audio/mpeg" /></audio>
+    </div>
   </div>
-</div>
 
-<!-- 🎥 Video - Exhaust -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="exhaust" data-type="video">
-  <img src="assets/img/Looserattlingmuffler.jpg" alt="Loose muffler" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Fixing a Loose Muffler</h2>
-    <p class="text-sm text-gray-600 mb-3">Step-by-step repair of rattling exhaust brackets and hangers.</p>
-    <a href="public/Sounds/muffler_fix.mp4" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition">🎥 Watch Video</a>
+  <!-- 🎥 Video - Engine (YouTube) -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col"
+       data-category="engine" data-type="video" data-vgroup="maintenance">
+    <img src="assets/img/Whistlingairintake.jpg" alt="Whistling air intake" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Air Intake Whistle</h2>
+      <p class="text-sm text-gray-600 mb-3">Watch how intake issues create whistling sounds & fix airflow.</p>
+      <a href="https://www.youtube.com/watch?v=VIDEO_ID" target="_blank" rel="noopener"
+         class="bg-red-600 text-white px-4 py-2 rounded text-sm w-fit hover:bg-red-700 transition">▶️ Watch on YouTube</a>
+    </div>
   </div>
-</div>
 
-<!-- 🔉 Audio - Engine -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="audio">
-  <img src="assets/img/Tickingvalvelifters.jpg" alt="Ticking valve lifters" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Ticking from Valve Lifters</h2>
-    <p class="text-sm text-gray-600 mb-3">Typical ticking from worn or dirty valve lifters.</p>
-    <audio controls class="w-full"><source src="public/Sounds/ticking_valve_lifter.mp3" type="audio/mpeg" /></audio>
+  <!-- 📄 PDF - Steering -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="steering" data-type="pdf">
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Steering Noises (PDF)</h2>
+      <p class="text-sm text-gray-600 mb-3">Guide to diagnose groaning or whining sounds in steering systems.</p>
+      <a href="tutorial_pdfs/steering.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+    </div>
   </div>
-</div>
 
-<!-- 📄 PDF - Brake -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="brake" data-type="pdf">
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Grinding Brakes PDF</h2>
-    <p class="text-sm text-gray-600 mb-3">Understand the signs of severe brake wear and rotor damage.</p>
-    <a href="tutorial_pdfs/grinding.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+  <!-- 🎥 Video - Exhaust (YouTube) -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col"
+       data-category="exhaust" data-type="video" data-vgroup="fix">
+    <img src="assets/img/Looserattlingmuffler.jpg" alt="Loose muffler" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Fixing a Loose Muffler</h2>
+      <p class="text-sm text-gray-600 mb-3">Repair rattling exhaust brackets and hangers.</p>
+      <a href="https://www.youtube.com/watch?v=VIDEO_ID" target="_blank" rel="noopener"
+         class="bg-red-600 text-white px-4 py-2 rounded text-sm w-fit hover:bg-red-700 transition">▶️ Watch on YouTube</a>
+    </div>
   </div>
-</div>
 
-<!-- 🎥 Video - Vacuum -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="vacuum" data-type="video">
-  <img src="assets/img/default-sound.jpg" alt="Vacuum leak" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Finding Vacuum Leaks</h2>
-    <p class="text-sm text-gray-600 mb-3">Learn how to detect leaks using sound and smoke testing.</p>
-    <a href="public/Sounds/vacuum_demo.mp4" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition">🎥 Watch Video</a>
+  <!-- 🔉 Audio - Engine -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="audio">
+    <img src="assets/img/Tickingvalvelifters.jpg" alt="Ticking valve lifters" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Ticking from Valve Lifters</h2>
+      <p class="text-sm text-gray-600 mb-3">Typical ticking from worn or dirty valve lifters.</p>
+      <audio controls class="w-full"><source src="public/Sounds/ticking_valve_lifter.mp3" type="audio/mpeg" /></audio>
+    </div>
   </div>
-</div>
 
-<!-- 🔉 Audio - Fuel Pump -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="audio">
-  <img src="assets/img/Buzzingfuelpump.jpg" alt="Buzzing fuel pump" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Buzzing Fuel Pump</h2>
-    <p class="text-sm text-gray-600 mb-3">Fuel pump buzz when turning the key, hear what’s normal vs. faulty.</p>
-    <audio controls class="w-full"><source src="public/Sounds/buzzing_fuel_pump.mp3" type="audio/mpeg" /></audio>
+  <!-- 📄 PDF - Brake -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="brake" data-type="pdf">
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Grinding Brakes PDF</h2>
+      <p class="text-sm text-gray-600 mb-3">Understand the signs of severe brake wear and rotor damage.</p>
+      <a href="tutorial_pdfs/grinding.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+    </div>
   </div>
-</div>
 
-<!-- 📄 PDF - Drivetrain -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="drivetrain" data-type="pdf">
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Drivetrain Noise Guide</h2>
-    <p class="text-sm text-gray-600 mb-3">PDF overview of differential and axle noises while driving.</p>
-    <a href="tutorial_pdfs/drivetrain_noise.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+  <!-- 🎥 Video - Transmission (YouTube) -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col"
+       data-category="transmission" data-type="video" data-vgroup="inspect">
+    <img src="assets/img/Grindinggears.jpg" alt="Grinding gears" class="rounded-xl mb-4 w-full h-40 object-cover" />
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Gear Grinding Explained</h2>
+      <p class="text-sm text-gray-600 mb-3">Bad shifting habits and how to avoid synchro damage.</p>
+      <a href="https://www.youtube.com/watch?v=VIDEO_ID" target="_blank" rel="noopener"
+         class="bg-red-600 text-white px-4 py-2 rounded text-sm w-fit hover:bg-red-700 transition">▶️ Watch on YouTube</a>
+    </div>
   </div>
-</div>
 
-<!-- 🎥 Video - Transmission -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="transmission" data-type="video">
-  <img src="assets/img/Grindinggears.jpg" alt="Grinding gears" class="rounded-xl mb-4 w-full h-40 object-cover" />
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Gear Grinding Explained</h2>
-    <p class="text-sm text-gray-600 mb-3">Video showing bad shifting habits and how to avoid synchro damage.</p>
-    <a href="public/Sounds/grinding_gears_demo.mp4" target="_blank" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 transition">🎥 Watch Video</a>
+  <!-- 📄 PDF - Buzzing -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="pdf">
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Buzzing Noise</h2>
+      <p class="text-sm text-gray-600 mb-3">PDF guide for diagnosing buzzing noise.</p>
+      <a href="tutorial_pdfs/buzzing.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+    </div>
   </div>
-</div>
-<!-- 📄 PDF - buzzing -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="pdf">
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">Buzzing Noise</h2>
-    <p class="text-sm text-gray-600 mb-3">PDF guide for diagnosing Buzzing Noise.</p>
-    <a href="tutorial_pdfs/buzzing.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+
+  <!-- 📄 PDF - Clicking -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="pdf">
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Clicking Noise from CV Joints</h2>
+      <p class="text-sm text-gray-600 mb-3">PDF guide for diagnosing clicking noise.</p>
+      <a href="tutorial_pdfs/clicking.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+    </div>
   </div>
-</div>
-<!-- 📄 PDF - clicking -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="pdf">
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1"> Clicking noise from worn CV joints</h2>
-    <p class="text-sm text-gray-600 mb-3">PDF guide for diagnosing clicking noise. </p>
-    <a href="tutorial_pdfs/clicking.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+
+  <!-- 📄 PDF - Whistling -->
+  <div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="pdf">
+    <div class="flex-1">
+      <h2 class="text-lg font-bold text-blue-700 mb-1">Whistling Noises from Vacuum Leaks</h2>
+      <p class="text-sm text-gray-600 mb-3">PDF guide for diagnosing whistling noises.</p>
+      <a href="tutorial_pdfs/whistling.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
+    </div>
   </div>
-</div>
-<!-- 📄 PDF - whistling -->
-<div class="tutorial bg-white rounded-2xl shadow p-4 flex flex-col" data-category="engine" data-type="pdf">
-  <div class="flex-1">
-    <h2 class="text-lg font-bold text-blue-700 mb-1">  Whistling noises from Vacuum leaks</h2>
-    <p class="text-sm text-gray-600 mb-3">PDF guide for diagnosing whistling noises. </p>
-    <a href="tutorial_pdfs/whistling.pdf" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition">📄 View PDF</a>
-  </div>
-</div>
+
   <!-- Script -->
   <script>
     const searchInput = document.getElementById("searchInput");
     const categoryFilter = document.getElementById("categoryFilter");
     const typeFilter = document.getElementById("typeFilter");
-    const videoSection = document.getElementById("videoSection");
+
+    // New containers for video sub-groups
+    const videoFix = document.getElementById("videoFix");
+    const videoInspect = document.getElementById("videoInspect");
+    const videoMaintenance = document.getElementById("videoMaintenance");
+
     const audioSection = document.getElementById("audioSection");
     const pdfSection = document.getElementById("pdfSection");
 
     const tutorials = Array.from(document.querySelectorAll(".tutorial"));
 
-    // Inject into right section
+    // Distribute cards into the right sections
     tutorials.forEach(tutorial => {
       const type = tutorial.dataset.type;
-      if (type === "video") videoSection.appendChild(tutorial);
-      else if (type === "audio") audioSection.appendChild(tutorial);
+
+      if (type === "video") {
+        const group = (tutorial.dataset.vgroup || "").toLowerCase();
+        if (group === "fix") videoFix.appendChild(tutorial);
+        else if (group === "inspect") videoInspect.appendChild(tutorial);
+        else if (group === "maintenance") videoMaintenance.appendChild(tutorial);
+        else videoInspect.appendChild(tutorial); // default
+        return;
+      }
+
+      if (type === "audio") audioSection.appendChild(tutorial);
       else if (type === "pdf") pdfSection.appendChild(tutorial);
     });
 
@@ -292,15 +292,16 @@
       const selectedType = typeFilter.value;
 
       tutorials.forEach(tutorial => {
-        const title = tutorial.querySelector("h2").textContent.toLowerCase();
-        const category = tutorial.dataset.category;
-        const type = tutorial.dataset.type;
+        const titleEl = tutorial.querySelector("h2");
+        const title = titleEl ? titleEl.textContent.toLowerCase() : tutorial.textContent.toLowerCase();
+        const category = tutorial.dataset.category || "";
+        const type = tutorial.dataset.type || "";
 
         const matchesSearch = title.includes(searchText);
         const matchesCategory = selectedCategory === "" || category === selectedCategory;
         const matchesType = selectedType === "" || type === selectedType;
 
-        tutorial.style.display = matchesSearch && matchesCategory && matchesType ? "block" : "none";
+        tutorial.style.display = (matchesSearch && matchesCategory && matchesType) ? "block" : "none";
       });
     }
 
