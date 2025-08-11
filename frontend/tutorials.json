@@ -1,0 +1,187 @@
+[
+  {
+    "id": "video-brake-replace-pads",
+    "title": "How to Replace Brake Pads",
+    "type": "video",
+    "category": "brake",
+    "vgroup": "fix",
+    "description": "A quick video on safely changing brake pads at home.",
+    "thumb": "assets/img/brake.jpg",
+    "videoUrl": "public/Sounds/frein_changement.mp4",
+    "ytId": null
+  },
+  {
+    "id": "audio-engine-knocking",
+    "title": "Engine Knocking",
+    "type": "audio",
+    "category": "engine",
+    "description": "Listen to this knocking engine sound and compare it to yours.",
+    "thumb": "assets/img/KnockingEngine.jpg",
+    "audioUrl": "public/Sounds/example_sounds/engine_knocking.mp3"
+  },
+  {
+    "id": "pdf-suspension-clunking",
+    "title": "Clunking in Suspension",
+    "type": "pdf",
+    "category": "suspension",
+    "description": "This guide explains common causes of clunking under the car.",
+    "pdfUrl": "tutorial_pdfs/clunking.pdf"
+  },
+  {
+    "id": "audio-brake-squealing",
+    "title": "Squealing Brake Pads",
+    "type": "audio",
+    "category": "brake",
+    "description": "Squealing often means worn pads or metal-on-metal contact.",
+    "thumb": "assets/img/Squealingbrakepads.jpg",
+    "audioUrl": "public/Sounds/squealing_brakes.mp3"
+  },
+  {
+    "id": "pdf-engine-ticking",
+    "title": "Ticking from Valve Lifters",
+    "type": "pdf",
+    "category": "engine",
+    "description": "PDF guide for diagnosing ticking noises related to valve lifters.",
+    "pdfUrl": "tutorial_pdfs/ticking.pdf"
+  },
+  {
+    "id": "video-steering-noise-causes",
+    "title": "Steering Noise Causes",
+    "type": "video",
+    "category": "steering",
+    "vgroup": "inspect",
+    "description": "Video on diagnosing power steering whining and groaning sounds.",
+    "thumb": "assets/img/steering.jpg",
+    "videoUrl": "public/Sounds/steering_guide.mp4",
+    "ytId": null
+  },
+  {
+    "id": "audio-exhaust-rattling-muffler",
+    "title": "Rattling Muffler",
+    "type": "audio",
+    "category": "exhaust",
+    "description": "Sound of a loose or rusted muffler shaking under the car.",
+    "thumb": "assets/img/Looserattlingmuffler.jpg",
+    "audioUrl": "public/Sounds/rattling_muffler.mp3"
+  },
+  {
+    "id": "audio-vacuum-hissing",
+    "title": "Hissing from Vacuum Leak",
+    "type": "audio",
+    "category": "vacuum",
+    "description": "Classic vacuum leak hissing sound example.",
+    "thumb": "assets/img/default-sound.jpg",
+    "audioUrl": "public/Sounds/hissing_vacuum_leak.mp3"
+  },
+  {
+    "id": "video-engine-air-intake-whistle",
+    "title": "Air Intake Whistle",
+    "type": "video",
+    "category": "engine",
+    "vgroup": "maintenance",
+    "description": "Watch how air leaks around the intake can create whistling sounds.",
+    "thumb": "assets/img/Whistlingairintake.jpg",
+    "videoUrl": "public/Sounds/whistle_demo.mp4",
+    "ytId": null
+  },
+  {
+    "id": "audio-drivetrain-clicking-cv-axle",
+    "title": "Clicking CV Axle",
+    "type": "audio",
+    "category": "drivetrain",
+    "description": "CV joints often click when turning if they're worn out.",
+    "thumb": "assets/img/ClickingCVaxle.jpg",
+    "audioUrl": "public/Sounds/clicking_axle.mp3"
+  },
+  {
+    "id": "pdf-steering-noises",
+    "title": "Steering Noises (PDF)",
+    "type": "pdf",
+    "category": "steering",
+    "description": "Guide to diagnose groaning or whining sounds in steering systems.",
+    "pdfUrl": "tutorial_pdfs/steering.pdf"
+  },
+  {
+    "id": "video-exhaust-fixing-loose-muffler",
+    "title": "Fixing a Loose Muffler",
+    "type": "video",
+    "category": "exhaust",
+    "vgroup": "fix",
+    "description": "Step-by-step repair of rattling exhaust brackets and hangers.",
+    "thumb": "assets/img/Looserattlingmuffler.jpg",
+    "videoUrl": "public/Sounds/muffler_fix.mp4",
+    "ytId": null
+  },
+  {
+    "id": "audio-engine-ticking-valve-lifters",
+    "title": "Ticking from Valve Lifters",
+    "type": "audio",
+    "category": "engine",
+    "description": "Typical ticking from worn or dirty valve lifters.",
+    "thumb": "assets/img/Tickingvalvelifters.jpg",
+    "audioUrl": "public/Sounds/ticking_valve_lifter.mp3"
+  },
+  {
+    "id": "pdf-brake-grinding-brakes",
+    "title": "Grinding Brakes PDF",
+    "type": "pdf",
+    "category": "brake",
+    "description": "Understand the signs of severe brake wear and rotor damage.",
+    "pdfUrl": "tutorial_pdfs/grinding.pdf"
+  },
+  {
+    "id": "video-vacuum-finding-leaks",
+    "title": "Finding Vacuum Leaks",
+    "type": "video",
+    "category": "vacuum",
+    "vgroup": "inspect",
+    "description": "Learn how to detect leaks using sound and smoke testing.",
+    "thumb": "assets/img/default-sound.jpg",
+    "videoUrl": "public/Sounds/vacuum_demo.mp4",
+    "ytId": null
+  },
+  {
+    "id": "audio-engine-buzzing-fuel-pump",
+    "title": "Buzzing Fuel Pump",
+    "type": "audio",
+    "category": "engine",
+    "description": "Fuel pump buzz when turning the key, what's normal vs. faulty.",
+    "thumb": "assets/img/Buzzingfuelpump.jpg",
+    "audioUrl": "public/Sounds/buzzing_fuel_pump.mp3"
+  },
+  {
+    "id": "video-transmission-gear-grinding-explained",
+    "title": "Gear Grinding Explained",
+    "type": "video",
+    "category": "transmission",
+    "vgroup": "inspect",
+    "description": "Bad shifting habits and how to avoid synchro damage.",
+    "thumb": "assets/img/Grindinggears.jpg",
+    "videoUrl": "public/Sounds/grinding_gears_demo.mp4",
+    "ytId": null
+  },
+  {
+    "id": "pdf-engine-buzzing-noise",
+    "title": "Buzzing Noise",
+    "type": "pdf",
+    "category": "engine",
+    "description": "PDF guide for diagnosing Buzzing Noise.",
+    "pdfUrl": "tutorial_pdfs/buzzing.pdf"
+  },
+  {
+    "id": "pdf-engine-clicking-noise-cv-joints",
+    "title": "Clicking noise from worn CV joints",
+    "type": "pdf",
+    "category": "engine",
+    "description": "PDF guide for diagnosing clicking noise.",
+    "pdfUrl": "tutorial_pdfs/clicking.pdf"
+  },
+  {
+    "id": "pdf-engine-whistling-vacuum-leaks",
+    "title": "Whistling noises from Vacuum leaks",
+    "type": "pdf",
+    "category": "engine",
+    "description": "PDF guide for diagnosing whistling noises.",
+    "pdfUrl": "tutorial_pdfs/whistling.pdf"
+  }
+]
