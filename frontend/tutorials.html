@@ -22,6 +22,10 @@
     .fav-btn{position:absolute;top:.5rem;right:.5rem;font-size:26px;line-height:1;color:#9ca3af;transition:transform .15s ease}
     .fav-btn:hover{transform:scale(1.1)}
     .fav-btn.is-fav{color:#eab308} /* étoile dorée quand favori */
+    /* Assure que l'étoile s’ancre bien en haut/droite de chaque carte */
+.tutorial { position: relative; }
+.fav-btn { z-index: 10; } /* par sécurité pour passer au-dessus de l'image */
+
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
