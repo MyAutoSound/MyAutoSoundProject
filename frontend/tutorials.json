@@ -25,6 +25,7 @@
     "type": "pdf",
     "category": "suspension",
     "description": "This guide explains common causes of clunking under the car.",
+    "thumb": "assets/img/PDF.jpg",
     "pdfUrl": "tutorial_pdfs/clunking.pdf"
   },
   {
@@ -42,6 +43,7 @@
     "type": "pdf",
     "category": "engine",
     "description": "PDF guide for diagnosing ticking noises related to valve lifters.",
+    "thumb": "assets/img/PDF.jpg",
     "pdfUrl": "tutorial_pdfs/ticking.pdf"
   },
   {
@@ -99,6 +101,7 @@
     "type": "pdf",
     "category": "steering",
     "description": "Guide to diagnose groaning or whining sounds in steering systems.",
+    "thumb": "assets/img/PDF.jpg",
     "pdfUrl": "tutorial_pdfs/steering.pdf"
   },
   {
@@ -167,6 +170,7 @@
     "type": "pdf",
     "category": "engine",
     "description": "PDF guide for diagnosing Buzzing Noise.",
+    "thumb": "assets/img/PDF.jpg",
     "pdfUrl": "tutorial_pdfs/buzzing.pdf"
   },
   {
@@ -175,6 +179,7 @@
     "type": "pdf",
     "category": "engine",
     "description": "PDF guide for diagnosing clicking noise.",
+    "thumb": "assets/img/PDF.jpg",
     "pdfUrl": "tutorial_pdfs/clicking.pdf"
   },
   {
@@ -183,6 +188,7 @@
     "type": "pdf",
     "category": "engine",
     "description": "PDF guide for diagnosing whistling noises.",
+    "thumb": "assets/img/PDF.jpg",
     "pdfUrl": "tutorial_pdfs/whistling.pdf"
   }
 ]
