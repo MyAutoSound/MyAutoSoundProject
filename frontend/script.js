@@ -2,6 +2,16 @@ let mediaRecorder;
 let recordedChunks = [];
 let history = [];
 
+// --- Rotating loading messages (nouveau) ---
+let rotTimer = null;
+const rotatingMsgs = [
+  "Uploading & securing your audio…",
+  "Transcribing the sound…",
+  "Analyzing patterns (pitch, rhythm, duration)…",
+  "Cross-checking common failure modes…",
+  "Preparing recommendations…",
+];
+
 document.addEventListener("DOMContentLoaded", () => {
   const recordButton = document.getElementById("recordButton");
   const recordedAudio = document.getElementById("recordedAudio");
@@ -10,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const historyList = document.getElementById("historyList");
   const clearButton = document.getElementById("clearHistoryButton");
   const loadingEl = document.getElementById("loading");
+  const loadingRotating = document.getElementById("loadingRotating"); // <- utilisé pour les messages
   const submitBtn = diagnosisForm?.querySelector('button[type="submit"]');
   const downloadBtn = document.getElementById('downloadPdfBtn');
 
@@ -74,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Report JSON structuré
       fd.append("report", JSON.stringify(payload));
 
-      // Audio: upload > enregistrement > nada
+      // Audio: upload > enregistrement
       const fileInput = document.getElementById("audioFile");
       if (fileInput?.files?.length > 0) {
         fd.append("audio", fileInput.files[0]);
@@ -131,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHistory();
   });
 
-  // ---- Export PDF brandé (multi-pages, sommaire, en-tête/pied)
+  // ---- Export PDF brandé (jsPDF)
   downloadBtn?.addEventListener('click', downloadPdfReport);
 
   async function downloadPdfReport() {
@@ -213,10 +224,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (logoDataURL) {
         doc.addImage(logoDataURL, 'PNG', margin, 3.5, 18, 5);
-        doc.setFont('helvetica','bold'); doc.setFontSize(12); setCol('#ffffff');
+        doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(255,255,255);
         doc.text(BRAND.name, margin + 22, 8.5);
       } else {
-        doc.setFont('helvetica','bold'); doc.setFontSize(14); setCol('#ffffff');
+        doc.setFont('helvetica','bold'); doc.setFontSize(14); doc.setTextColor(255,255,255);
         doc.text(BRAND.name, margin, 8.5);
       }
       setCol(BRAND.accent);
@@ -359,8 +370,27 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---- UI helpers
   function toggleLoading(on) {
     if (!loadingEl) return;
-    if (on) { loadingEl.classList.remove("hidden"); submitBtn && (submitBtn.disabled = true); }
-    else { loadingEl.classList.add("hidden"); submitBtn && (submitBtn.disabled = false); }
+    if (on) {
+      loadingEl.classList.remove("hidden");
+      submitBtn && (submitBtn.disabled = true);
+
+      // Démarre le message tournant
+      if (loadingRotating) {
+        let i = 0;
+        loadingRotating.textContent = rotatingMsgs[0];
+        clearInterval(rotTimer);
+        rotTimer = setInterval(() => {
+          i = (i + 1) % rotatingMsgs.length;
+          loadingRotating.textContent = rotatingMsgs[i];
+        }, 2000);
+      }
+    } else {
+      loadingEl.classList.add("hidden");
+      submitBtn && (submitBtn.disabled = false);
+      // Stoppe le message tournant
+      clearInterval(rotTimer);
+      rotTimer = null;
+    }
   }
 
   function displayDiagnosis(data) {

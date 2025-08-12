@@ -95,7 +95,7 @@
 
     <form id="diagnosisForm" enctype="multipart/form-data">
 
-      <!-- Step Section with background -->
+      <!-- Step Section with background (MASONRY) -->
       <section
         class="relative w-full py-12 rounded-3xl overflow-hidden"
         style="
@@ -107,9 +107,11 @@
       >
         <div class="absolute inset-0 bg-black bg-opacity-40 pointer-events-none"></div>
 
-        <div class="relative px-6 flex flex-col lg:flex-row gap-8 z-10">
+        <!-- 🧱 Masonry: 1 colonne sur mobile, 2 colonnes à partir de md -->
+        <div class="relative px-6 z-10 md:columns-2 md:[column-gap:2rem]">
+
           <!-- Step 1 -->
-          <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
+          <div class="break-inside-avoid bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl mb-8">
             <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
               📝 Step 1 – Describe the Sound
             </h2>
@@ -192,8 +194,8 @@
             </details>
           </div>
 
-          <!-- Step 2 (ENRICHED) -->
-          <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
+          <!-- Step 2 -->
+          <div class="break-inside-avoid bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl mb-8">
             <div class="flex items-center gap-3 mb-3">
               <span class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">Step 2</span>
               <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">📍 Provide more details</h2>
@@ -202,7 +204,11 @@
             <!-- WHERE -->
             <div class="mb-6">
               <label for="location" class="block mb-2 font-semibold">Where is the sound coming from?</label>
-              <select id="location" name="location" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+              <select
+                id="location"
+                name="location"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
                 <option>Front Left</option>
                 <option>Front Right</option>
                 <option>Rear Left</option>
@@ -217,7 +223,11 @@
             <!-- WHEN (primary) -->
             <div class="mb-6">
               <label for="situation" class="block mb-2 font-semibold">Primary situation (most frequent):</label>
-              <select id="situation" name="situation" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+              <select
+                id="situation"
+                name="situation"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
                 <option>At startup</option>
                 <option>While accelerating</option>
                 <option>While braking</option>
@@ -264,7 +274,7 @@
               </div>
             </div>
 
-            <div class="grid sm:grid-cols-2 gap-6 mb-6">
+            <div class="grid sm:grid-cols-3 gap-6 mb-6">
               <div>
                 <label class="block mb-2 font-semibold">Rhythm</label>
                 <select id="rhythm" name="rhythm" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -284,14 +294,6 @@
                   <option>Continuous</option>
                 </select>
               </div>
-            </div>
-
-            <div class="grid sm:grid-cols-3 gap-6 mb-6">
-              <div>
-                <label class="block mb-2 font-semibold">Pitch</label>
-                <input id="pitch" name="pitch" type="range" min="1" max="5" value="3" class="w-full">
-                <div class="flex justify-between text-xs text-gray-500 mt-1"><span>Low</span><span>High</span></div>
-              </div>
               <div>
                 <label class="block mb-2 font-semibold">Speed range</label>
                 <select id="speedRange" name="speedRange" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
@@ -301,6 +303,14 @@
                   <option>Any speed</option>
                 </select>
               </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label class="block mb-2 font-semibold">Pitch</label>
+                <input id="pitch" name="pitch" type="range" min="1" max="5" value="3" class="w-full">
+                <div class="flex justify-between text-xs text-gray-500 mt-1"><span>Low</span><span>High</span></div>
+              </div>
               <div>
                 <label class="block mb-2 font-semibold">Severity (1–5)</label>
                 <input id="severity" name="severity" type="range" min="1" max="5" value="3" class="w-full">
@@ -308,111 +318,134 @@
               </div>
             </div>
 
-            <!-- ADVANCED (optional) -->
+            <!-- Advanced details -->
             <details class="mb-6">
-              <summary class="cursor-pointer text-blue-700 font-semibold text-lg">Advanced details (optional) ▼</summary>
-              <div class="mt-4 grid sm:grid-cols-2 gap-6">
+              <summary class="cursor-pointer text-blue-700 font-semibold text-lg">▶ Advanced details (optional)</summary>
+              <div class="mt-4 space-y-5 text-sm">
                 <div>
-                  <label class="block mb-2 font-semibold">Vehicle mileage</label>
-                  <input id="mileage" name="mileage" type="number" min="0" placeholder="e.g. 125000" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                </div>
-                <div>
-                  <label class="block mb-2 font-semibold">Transmission</label>
-                  <select id="transmission" name="transmission" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <option>Automatic</option>
-                    <option>Manual</option>
-                    <option>CVT</option>
-                    <option>Unknown</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block mb-2 font-semibold">Fuel type</label>
-                  <select id="fuel" name="fuel" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <option>Gasoline</option>
-                    <option>Diesel</option>
-                    <option>Hybrid</option>
-                    <option>EV</option>
-                    <option>Unknown</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block mb-2 font-semibold">Any warning lights?</label>
-                  <div class="grid grid-cols-2 gap-2 text-sm">
-                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Check Engine"> Check Engine</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="ABS"> ABS</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Brake"> Brake</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Oil"> Oil</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Battery"> Battery</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="None"> None</label>
+                  <p class="font-semibold mb-2">Weather / road conditions</p>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <label class="flex items-center gap-2"><input type="checkbox" name="weather" value="Rain"> Rain</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="weather" value="Snow"> Snow</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="weather" value="Very cold"> Very cold</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="weather" value="Hot day"> Hot day</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="weather" value="Gravel / rough roads"> Gravel / rough roads</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="weather" value="After car wash"> After car wash</label>
                   </div>
                 </div>
-                <div class="sm:col-span-2">
-                  <label class="block mb-2 font-semibold">Recent events</label>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Hit pothole / curb"> Hit pothole / curb</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Recent service / repair"> Recent service / repair</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="After heavy rain / car wash"> After heavy rain / car wash</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Towed heavy load"> Towed heavy load</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Long storage / sat unused"> Long storage / sat unused</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Refueled recently"> Refueled recently</label>
+
+                <div>
+                  <p class="font-semibold mb-2">Vehicle mods</p>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <label class="flex items-center gap-2"><input type="checkbox" name="mods" value="Aftermarket intake/exhaust"> Aftermarket intake/exhaust</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="mods" value="Lift or lowering kit"> Lift or lowering kit</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="mods" value="Larger wheels/tires"> Larger wheels/tires</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="mods" value="Performance tune"> Performance tune</label>
                   </div>
                 </div>
+
                 <div>
-                  <label class="block mb-2 font-semibold">OBD-II code (if any)</label>
-                  <input id="obdCode" name="obdCode" type="text" placeholder="e.g. P0301" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                  <p class="font-semibold mb-2">Recent work</p>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recentWork" value="Brake service"> Brake service</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recentWork" value="Suspension work"> Suspension work</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recentWork" value="Tire change/alignment"> Tire change/alignment</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recentWork" value="Oil change"> Oil change</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recentWork" value="Transmission work"> Transmission work</label>
+                  </div>
                 </div>
+
                 <div>
-                  <label class="block mb-2 font-semibold">Reproducible?</label>
-                  <select id="reproducible" name="reproducible" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <option>Always</option>
-                    <option>Often</option>
-                    <option>Sometimes</option>
-                    <option>Rarely</option>
-                  </select>
+                  <p class="font-semibold mb-2">Dashboard lights</p>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <label class="flex items-center gap-2"><input type="checkbox" name="dashLights" value="Check Engine"> Check Engine</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="dashLights" value="ABS"> ABS</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="dashLights" value="Brake"> Brake</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="dashLights" value="Battery/Charging"> Battery/Charging</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="dashLights" value="Power Steering"> Power Steering</label>
+                  </div>
                 </div>
               </div>
             </details>
 
-            <!-- Notes -->
+            <!-- Vehicle / Notes -->
             <div class="mb-6">
-              <label for="notes" class="block mb-2 font-semibold">Any other notes?</label>
-              <textarea id="notes" name="notes" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none" placeholder="Optional..."></textarea>
+              <label for="makeModel" class="block mb-2 font-semibold">Vehicle make and model:</label>
+              <input
+                type="text"
+                id="makeModel"
+                name="makeModel"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                placeholder="e.g. Toyota Corolla 2016"
+              />
             </div>
 
-            <!-- Vehicle make/model -->
-            <div class="mb-2">
-              <label for="makeModel" class="block mb-2 font-semibold">Vehicle make and model:</label>
-              <input type="text" id="makeModel" name="makeModel" placeholder="e.g. Toyota Corolla 2016" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            <div class="mb-1">
+              <label for="notes" class="block mb-2 font-semibold">Any other notes?</label>
+              <textarea
+                id="notes"
+                name="notes"
+                class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                placeholder="Optional..."
+              ></textarea>
             </div>
           </div>
+
+          <!-- 🧠 Draft status + clear (remonte sous Step 1 si place libre) -->
+          <div class="break-inside-avoid mt-6">
+            <div class="flex items-center justify-between">
+              <p id="draftStatus" class="text-sm text-gray-500">Drafts auto-save locally as you type.</p>
+              <button type="button" id="clearDraftBtn" class="text-sm text-blue-600 hover:underline">Clear draft</button>
+            </div>
+          </div>
+
+          <!-- ✅ Submit button (remonte sous Step 1 si place libre) -->
+          <div class="break-inside-avoid flex justify-center mt-6">
+            <button
+              type="submit"
+              class="bg-blue-600 bg-opacity-80 backdrop-blur-md text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700 hover:bg-opacity-100 hover:scale-105 transform transition duration-300 ease-in-out ring-1 ring-blue-300"
+            >
+              Diagnose
+            </button>
+          </div>
+
         </div>
       </section>
-
-      <!-- Draft status + clear -->
-      <div class="mt-6 flex items-center justify-between">
-        <p id="draftStatus" class="text-sm text-gray-500">Drafts auto-save locally as you type.</p>
-        <button type="button" id="clearDraftBtn" class="text-sm text-blue-600 hover:underline">Clear draft</button>
-      </div>
-
-      <!-- Submit Button -->
-      <div class="flex justify-center mt-10">
-        <button
-          type="submit"
-          class="bg-blue-600 bg-opacity-80 backdrop-blur-md text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700 hover:bg-opacity-100 hover:scale-105 transform transition duration-300 ease-in-out ring-1 ring-blue-300"
-        >
-          Diagnose
-        </button>
-      </div>
-
+      <!-- /Step Section -->
     </form>
   </div>
 </section>
+<!-- /Diagnostic Section -->
 
-<!-- Loading Indicator -->
-<div id="loading" class="hidden flex justify-center mt-6">
-  <div class="animate-spin rounded-full h-8 w-8 border-t-4 border-blue-500"></div>
-  <span class="ml-3 text-blue-600 font-medium">Analyzing sound...</span>
+<!-- Loading overlay avec explications (amélioré) -->
+<div id="loading"
+     class="hidden fixed inset-0 z-[70] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm"
+     role="dialog" aria-modal="true" aria-labelledby="loadingTitle" aria-describedby="loadingMain">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 text-gray-800" tabindex="-1">
+    <div class="flex items-center gap-3 mb-2">
+      <div class="animate-spin rounded-full h-6 w-6 border-4 border-blue-600 border-t-transparent" aria-hidden="true"></div>
+      <p id="loadingTitle" class="font-semibold text-blue-700">Analyzing your report…</p>
+    </div>
+
+    <p id="loadingMain" class="text-sm text-gray-700 mb-3">
+      This may take 10–30 seconds depending on your connection and audio length.
+    </p>
+
+    <ul class="text-sm list-disc ml-5 space-y-1">
+      <li>Uploading your audio (if provided)</li>
+      <li>Transcribing the sound to text</li>
+      <li>Running AI analysis on patterns & operating conditions</li>
+      <li>Matching tutorials and possible parts</li>
+    </ul>
+
+    <!-- Zone de messages tournants -->
+    <div class="mt-4 text-xs text-gray-500 flex items-center gap-2" role="status" aria-live="polite">
+      <span class="inline-flex h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+      <span id="loadingRotating">Preparing analysis…</span>
+    </div>
+  </div>
 </div>
+
 
 <!-- AI Diagnosis + PDF button -->
 <div id="diagnosisResult" class="mt-10 hidden">
