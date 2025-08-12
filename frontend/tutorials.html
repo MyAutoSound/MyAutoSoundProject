@@ -7,6 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: 'Poppins', sans-serif; }
+    /* Les cartes doivent servir d’ancre pour le bouton étoile */
+    .tutorial { position: relative; }
     /* Lite YouTube embed */
     .yt-lite {
       position: relative; cursor: pointer; border-radius: 0.75rem;
@@ -19,13 +21,9 @@
       font-size: 48px; background: rgba(0,0,0,.35); color: #fff;
     }
     /* Favorite star: bien visible (sans dépendre de classes dynamiques) */
-    .fav-btn{position:absolute;top:.5rem;right:.5rem;font-size:26px;line-height:1;color:#9ca3af;transition:transform .15s ease}
+    .fav-btn{position:absolute;top:.5rem;right:.5rem;font-size:26px;line-height:1;color:#9ca3af;transition:transform .15s ease;z-index:10}
     .fav-btn:hover{transform:scale(1.1)}
     .fav-btn.is-fav{color:#eab308} /* étoile dorée quand favori */
-    /* Assure que l'étoile s’ancre bien en haut/droite de chaque carte */
-.tutorial { position: relative; }
-.fav-btn { z-index: 10; } /* par sécurité pour passer au-dessus de l'image */
-
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
@@ -192,7 +190,6 @@
     }
 
     function attachFavButton(card, item) {
-      card.classList.add('relative');
       const btn = document.createElement('button');
       btn.className = 'fav-btn';
       btn.type = 'button';
@@ -435,7 +432,6 @@
         count++;
       });
 
-      // Header/message
       favCount.textContent = count ? `(${count})` : '';
       if (favEmpty) favEmpty.style.display = count ? 'none' : 'block';
     }
