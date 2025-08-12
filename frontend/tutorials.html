@@ -18,9 +18,10 @@
       position: absolute; inset: 0; display: grid; place-items: center;
       font-size: 48px; background: rgba(0,0,0,.35); color: #fff;
     }
-    /* Favorite star button base (color toggled in JS) */
-    .fav-btn { transition: transform .15s ease; }
-    .fav-btn:hover { transform: scale(1.1); }
+    /* Favorite star: bien visible (sans dépendre de classes dynamiques) */
+    .fav-btn{position:absolute;top:.5rem;right:.5rem;font-size:26px;line-height:1;color:#9ca3af;transition:transform .15s ease}
+    .fav-btn:hover{transform:scale(1.1)}
+    .fav-btn.is-fav{color:#eab308} /* étoile dorée quand favori */
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
@@ -59,11 +60,12 @@
     </div>
 
     <!-- ⭐ Favorites -->
-    <div id="favoritesWrap" class="mt-10 hidden">
-      <div class="flex items-center justify-between mb-4">
+    <div id="favoritesWrap" class="mt-10">
+      <div class="flex items-center justify-between mb-2">
         <h2 class="text-2xl font-bold text-yellow-700">⭐ Favorites <span id="favCount" class="text-sm text-gray-500 font-normal"></span></h2>
         <button id="clearFavs" class="text-sm text-red-600 hover:underline">Clear all</button>
       </div>
+      <p id="favEmpty" class="text-sm text-gray-500 mb-4">No favorites yet. Click ★ on any card.</p>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="favoritesSection"></div>
     </div>
 
@@ -117,9 +119,9 @@
   <!-- ================== Loader from tutorials.json + Lite YouTube + Load More + Favorites ================== -->
   <script>
   (async () => {
-    const JSON_PATH = 'tutorials.json'; // ou 'data/tutorials.json'
-    const STEP = 6; // pagination par section
-    const FAV_KEY = 'mas_favs_v1';
+    const JSON_PATH = 'tutorials.json';   // ou 'data/tutorials.json'
+    const STEP = 6;                       // pagination par section
+    const FAV_KEY = 'mas_favs_v1';        // clé localStorage
 
     // Containers
     const containers = {
@@ -139,8 +141,8 @@
     };
     const favWrap = document.getElementById('favoritesWrap');
     const favCount = document.getElementById('favCount');
+    const favEmpty = document.getElementById('favEmpty');
     const clearFavsBtn = document.getElementById('clearFavs');
-
     const statusMsg = document.getElementById('statusMsg');
 
     // Filters
@@ -153,51 +155,42 @@
 
     // Helpers
     const fallbackThumb = 'assets/img/default-sound.jpg';
-    const imgHTML = (src, alt) => {
-      return `<img src="${src || fallbackThumb}" alt="${alt}" class="rounded-xl mb-4 w-full h-40 object-cover" loading="lazy" />`;
-    };
+    const imgHTML = (src, alt) => `<img src="${src || fallbackThumb}" alt="${alt}" class="rounded-xl mb-4 w-full h-40 object-cover" loading="lazy" />`;
     const ytThumb = (ytId) => `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
 
     // Favorites storage
-    const loadFavs = () => {
-      try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); }
-      catch { return new Set(); }
-    };
-    const saveFavs = (set) => {
-      try { localStorage.setItem(FAV_KEY, JSON.stringify([...set])); } catch {}
-    };
+    const loadFavs = () => { try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); } catch { return new Set(); } };
+    const saveFavs = (set) => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...set])); } catch {} };
     let FAVS = loadFavs();
 
     // Items data
     let items = [];
     const itemsById = new Map();
 
-    // Star UI updater
+    // UI: étoile maj
     function updateStarUI(id) {
       const active = FAVS.has(id);
       document.querySelectorAll(`.tutorial[data-id="${id}"] .fav-btn`).forEach(btn => {
         btn.textContent = active ? '★' : '☆';
-        btn.classList.toggle('text-yellow-500', active);
-        btn.classList.toggle('text-gray-300', !active);
+        btn.classList.toggle('is-fav', active);
         btn.setAttribute('aria-pressed', String(active));
         btn.title = active ? 'Remove from favorites' : 'Add to favorites';
         btn.setAttribute('aria-label', btn.title);
       });
-      updateFavWrapVisibility();
+      updateFavHeader();
     }
 
     function toggleFav(id) {
-      if (FAVS.has(id)) FAVS.delete(id);
-      else FAVS.add(id);
+      if (FAVS.has(id)) FAVS.delete(id); else FAVS.add(id);
       saveFavs(FAVS);
       updateStarUI(id);
-      renderFavorites(); // rebuild the favorites section
+      renderFavorites(); // reconstruit la section
     }
 
     function attachFavButton(card, item) {
       card.classList.add('relative');
       const btn = document.createElement('button');
-      btn.className = 'fav-btn absolute top-2 right-2 text-xl text-gray-300';
+      btn.className = 'fav-btn';
       btn.type = 'button';
       btn.setAttribute('aria-pressed', 'false');
       btn.title = 'Add to favorites';
@@ -228,10 +221,7 @@
         wrapper.style.backgroundImage = `url('${thumbUrl}')`;
         wrapper.setAttribute('aria-label', `Play ${item.title}`);
         wrapper.addEventListener('click', () => {
-          if (!hasConsent) {
-            window.open(`https://www.youtube.com/watch?v=${item.ytId}`, '_blank', 'noopener');
-            return;
-          }
+          if (!hasConsent) { window.open(`https://www.youtube.com/watch?v=${item.ytId}`, '_blank', 'noopener'); return; }
           const iframe = document.createElement('iframe');
           iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
           iframe.src = `https://www.youtube-nocookie.com/embed/${item.ytId}?autoplay=1&rel=0`;
@@ -315,7 +305,13 @@
       return card;
     }
 
-    // Load JSON and build cards
+    function createCardForItem(item) {
+      if (item.type === 'video') return createVideoCard(item);
+      if (item.type === 'audio') return createAudioCard(item);
+      return createPdfCard(item);
+    }
+
+    // Load JSON & build
     let allCards = [];
     const sections = { vfix: [], vins: [], vmaint: [], audio: [], pdf: [] };
     const limits = { vfix: STEP, vins: STEP, vmaint: STEP, audio: STEP, pdf: STEP };
@@ -354,13 +350,12 @@
       return;
     }
 
-    // Filtering + pagination
+    // Filters & pagination
     function matchesFilters(card) {
       const q = (searchInput?.value || '').toLowerCase();
       const cat = categoryFilter?.value || '';
       const typ = typeFilter?.value || '';
       const title = card._title || (card.querySelector('h2')?.textContent || '').toLowerCase();
-
       const okSearch = !q || title.includes(q);
       const okCat = !cat || (card.dataset.category === cat);
       const okType = !typ || (card.dataset.type === typ);
@@ -394,33 +389,23 @@
       renderFavorites();
     }
 
-    // Favorites rendering
-    function updateFavWrapVisibility() {
+    function updateFavHeader() {
+      // Met à jour le compteur et le message vide selon les filtres
       const q = (searchInput?.value || '').toLowerCase();
       const cat = categoryFilter?.value || '';
       const typ = typeFilter?.value || '';
-      // Count favorites that match current filters
       let matched = 0;
       FAVS.forEach(id => {
         const item = itemsById.get(id);
         if (!item) return;
-        const fakeCard = {
-          _title: (item.title || '').toLowerCase(),
-          dataset: { category: item.category || '', type: item.type || '' }
-        };
-        if (( !q || fakeCard._title.includes(q) ) &&
-            ( !cat || fakeCard.dataset.category === cat ) &&
-            ( !typ || fakeCard.dataset.type === typ )) matched++;
+        const title = (item.title || '').toLowerCase();
+        const okSearch = !q || title.includes(q);
+        const okCat = !cat || item.category === cat;
+        const okType = !typ || item.type === typ;
+        if (okSearch && okCat && okType) matched++;
       });
-
       favCount.textContent = matched ? `(${matched})` : '';
-      favWrap.style.display = matched ? 'block' : 'none';
-    }
-
-    function createCardForItem(item) {
-      if (item.type === 'video') return createVideoCard(item);
-      if (item.type === 'audio') return createAudioCard(item);
-      return createPdfCard(item);
+      if (favEmpty) favEmpty.style.display = matched ? 'none' : 'block';
     }
 
     function renderFavorites() {
@@ -430,6 +415,7 @@
       const cat = categoryFilter?.value || '';
       const typ = typeFilter?.value || '';
 
+      let count = 0;
       FAVS.forEach(id => {
         const item = itemsById.get(id);
         if (!item) return;
@@ -440,12 +426,14 @@
         if (!(okSearch && okCat && okType)) return;
 
         const card = createCardForItem(item);
-        // Marquer cette carte comme appartenant aux favoris
         card.dataset.section = 'favs';
         wrap.appendChild(card);
+        count++;
       });
 
-      updateFavWrapVisibility();
+      // Header/message
+      favCount.textContent = count ? `(${count})` : '';
+      if (favEmpty) favEmpty.style.display = count ? 'none' : 'block';
     }
 
     // Initial render
@@ -477,8 +465,7 @@
       const prev = new Set(FAVS);
       FAVS.clear();
       saveFavs(FAVS);
-      // update stars on all ids that were favorited
-      prev.forEach(id => updateStarUI(id));
+      prev.forEach(id => updateStarUI(id)); // met à jour étoiles sur toutes les cartes
       renderFavorites();
     });
   })();
