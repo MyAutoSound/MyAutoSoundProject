@@ -10,10 +10,11 @@
     body { font-family: "Poppins", sans-serif; }
     button { transition: all 0.3s ease; }
     button:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+    @keyframes micSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .fade-slide-up { animation: fadeSlideUp 0.6s ease forwards; }
-    @keyframes fadeSlideUp { 0%{opacity:0;transform:translateY(15px)}100%{opacity:1;transform:translateY(0)} }
+    @keyframes fadeSlideUp { 0%{opacity:0;transform:translateY(15px);} 100%{opacity:1;transform:translateY(0);} }
     .fade-in { animation: fadeIn 0.5s ease forwards; }
-    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
   </style>
 </head>
 <body class="min-h-screen bg-gray-100 bg-opacity-90 text-gray-800">
@@ -23,30 +24,28 @@
   <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
     <div class="text-xl font-bold text-blue-600">MyAutoSound</div>
     <nav class="space-x-6 text-sm md:text-base">
-      <a href="#diagnose" class="text-gray-700 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">Diagnose</a>
-      <a href="#about" class="text-gray-700 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">About</a>
-      <a href="#history" class="text-gray-700 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">History</a>
-      <a href="tutorials.html" class="text-gray-700 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">Tutorials</a>
+      <a href="#diagnosisForm" class="text-gray-700 hover:text-blue-600">Diagnose</a>
+      <a href="#about" class="text-gray-700 hover:text-blue-600">About</a>
+      <a href="#history" class="text-gray-700 hover:text-blue-600">History</a>
+      <a href="tutorials.html" class="text-gray-700 hover:text-blue-600">Tutorials</a>
     </nav>
   </div>
 </header>
 
 <!-- Hero Section -->
 <section class="relative bg-[url('https://images.unsplash.com/photo-1583126162406-643011b3f69f?q=80&w=1103&auto=format&fit=crop&ixlib=rb-4.1.0')] bg-center bg-no-repeat bg-cover py-28 px-6">
-  <!-- overlay + gradient pour lisibilité -->
-  <div class="absolute inset-0 bg-black/40"></div>
-  <div class="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
+  <div class="absolute inset-0 bg-black bg-opacity-50"></div>
 
   <div class="relative z-10 max-w-5xl mx-auto grid md:grid-cols-2 items-center gap-8 text-white">
     <div>
-      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-lg mb-4 fade-slide-up" style="animation-delay: 0.1s">
+      <h1 class="text-3xl md:text-4xl font-extrabold drop-shadow-lg mb-4 fade-slide-up" style="animation-delay: 0.1s">
         Identify Unusual Car Noises
       </h1>
       <p class="text-lg mb-6 drop-shadow fade-slide-up" style="animation-delay: 0.2s">
         Diagnose potential issues with your vehicle and avoid unnecessary repairs.
       </p>
 
-      <div class="space-y-4">
+      <div class="space-y-6">
         <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.3s">
           <span class="text-2xl">👂</span>
           <p class="drop-shadow"><strong>Describe or record the sound</strong></p>
@@ -59,28 +58,18 @@
           <span class="text-2xl">🛠️</span>
           <p class="drop-shadow"><strong>Follow easy tutorials to fix or inspect it</strong></p>
         </div>
-        <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.6s">
-          <span class="text-2xl">📍</span>
-          <p class="drop-shadow"><strong>Discover top-rated auto repair shops nearby</strong></p>
-        </div>
         <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.7s">
           <span class="text-2xl">🎓</span>
           <p class="drop-shadow">
             <a href="tutorials.html" class="text-blue-300 underline hover:text-white">
-              <strong>Fix it yourself</strong>
+              <strong> Fix ourself </strong>
             </a>
           </p>
         </div>
-      </div>
-
-      <!-- CTA principaux -->
-      <div class="mt-6 flex flex-wrap items-center gap-3">
-        <a href="#diagnose" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
-          🚗 Start diagnosis
-        </a>
-        <a href="tutorials.html" class="inline-flex items-center gap-2 bg-white/90 hover:bg-white text-gray-800 font-semibold px-6 py-3 rounded-lg shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
-          🎓 See tutorials
-        </a>
+        <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.6s">
+          <span class="text-2xl">📍</span>
+          <p class="drop-shadow"><strong>Discover top-rated auto repair shops nearby</strong></p>
+        </div>
       </div>
     </div>
   </div>
@@ -116,16 +105,14 @@
           background-repeat: no-repeat;
         "
       >
-        <div class="absolute inset-0 bg-black/40 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-40 pointer-events-none"></div>
 
-        <!-- grille au lieu de flex pour une meilleure structure -->
-        <div class="relative px-6 grid gap-8 lg:grid-cols-2 z-10">
+        <div class="relative px-6 flex flex-col lg:flex-row gap-8 z-10">
           <!-- Step 1 -->
           <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
-            <div class="flex items-center gap-3 mb-3">
-              <span class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">Step 1</span>
-              <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">📝 Describe the sound</h2>
-            </div>
+            <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
+              📝 Step 1 – Describe the Sound
+            </h2>
 
             <!-- Description -->
             <div class="mb-6">
@@ -145,7 +132,7 @@
               <button
                 id="recordButton"
                 type="button"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
               >
                 🎤 Start Recording
               </button>
@@ -161,7 +148,7 @@
                 id="audioFile"
                 name="audio"
                 accept="audio/*"
-                class="block w-full text-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-white file:bg-blue-600 hover:file:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                class="block w-full text-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-white file:bg-blue-600 hover:file:bg-blue-700"
               />
             </div>
 
@@ -205,228 +192,213 @@
             </details>
           </div>
 
-          <!-- Step 2 -->
-<div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
-  <div class="flex items-center gap-3 mb-3">
-    <span class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">Step 2</span>
-    <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">📍 Provide more details</h2>
-  </div>
+          <!-- Step 2 (ENRICHED) -->
+          <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
+            <div class="flex items-center gap-3 mb-3">
+              <span class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">Step 2</span>
+              <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">📍 Provide more details</h2>
+            </div>
 
-  <!-- WHERE -->
-  <div class="mb-6">
-    <label for="location" class="block mb-2 font-semibold">Where is the sound coming from?</label>
-    <select id="location" name="location"
-      class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-      <option>Front Left</option>
-      <option>Front Right</option>
-      <option>Rear Left</option>
-      <option>Rear Right</option>
-      <option>Engine</option>
-      <option>Under the Car</option>
-      <option>Dashboard</option>
-      <option>Not sure</option>
-    </select>
-  </div>
+            <!-- WHERE -->
+            <div class="mb-6">
+              <label for="location" class="block mb-2 font-semibold">Where is the sound coming from?</label>
+              <select id="location" name="location" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <option>Front Left</option>
+                <option>Front Right</option>
+                <option>Rear Left</option>
+                <option>Rear Right</option>
+                <option>Engine</option>
+                <option>Under the Car</option>
+                <option>Dashboard</option>
+                <option>Not sure</option>
+              </select>
+            </div>
 
-  <!-- WHEN (primaire) -->
-  <div class="mb-6">
-    <label for="situation" class="block mb-2 font-semibold">Primary situation (most frequent):</label>
-    <select id="situation" name="situation"
-      class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-      <option>At startup</option>
-      <option>While accelerating</option>
-      <option>While braking</option>
-      <option>While turning</option>
-      <option>At idle</option>
-      <option>After a speed bump</option>
-      <option>On rough roads</option>
-      <option>With A/C ON</option>
-    </select>
-  </div>
+            <!-- WHEN (primary) -->
+            <div class="mb-6">
+              <label for="situation" class="block mb-2 font-semibold">Primary situation (most frequent):</label>
+              <select id="situation" name="situation" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <option>At startup</option>
+                <option>While accelerating</option>
+                <option>While braking</option>
+                <option>While turning</option>
+                <option>At idle</option>
+                <option>After a speed bump</option>
+                <option>On rough roads</option>
+                <option>With A/C ON</option>
+              </select>
+            </div>
 
-  <!-- WHEN (secondaire multi) -->
-  <div class="mb-6">
-    <p class="block mb-2 font-semibold">When does it happen? (select all that apply)</p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Cold start"> Cold start</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Hot engine"> Hot engine</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Cruising"> Cruising</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Reversing"> Reversing</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Turning"> Turning</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Braking"> Braking</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Accelerating"> Accelerating</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Over bumps"> Over bumps</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Wet conditions"> Wet conditions</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="when" value="AC on"> A/C ON</label>
-    </div>
-  </div>
+            <!-- WHEN (secondary multi) -->
+            <div class="mb-6">
+              <p class="block mb-2 font-semibold">When does it happen? (select all that apply)</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Cold start"> Cold start</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Hot engine"> Hot engine</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Cruising"> Cruising</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Reversing"> Reversing</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Turning"> Turning</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Braking"> Braking</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Accelerating"> Accelerating</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Over bumps"> Over bumps</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="Wet conditions"> Wet conditions</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="when" value="AC on"> A/C ON</label>
+              </div>
+            </div>
 
-  <!-- SOUND PROFILE -->
-  <div class="mb-6">
-    <p class="block mb-2 font-semibold">How would you describe the sound? (select all that apply)</p>
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Squeal"> Squeal</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Whine"> Whine</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Knock"> Knock</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Tick"> Tick</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Rattle"> Rattle</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Grind"> Grind</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Hiss"> Hiss</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Click"> Click</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Hum"> Hum</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Clunk"> Clunk</label>
-      <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Pop"> Pop</label>
-    </div>
-  </div>
+            <!-- SOUND PROFILE -->
+            <div class="mb-6">
+              <p class="block mb-2 font-semibold">How would you describe the sound? (select all that apply)</p>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Squeal"> Squeal</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Whine"> Whine</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Knock"> Knock</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Tick"> Tick</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Rattle"> Rattle</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Grind"> Grind</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Hiss"> Hiss</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Click"> Click</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Hum"> Hum</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Clunk"> Clunk</label>
+                <label class="flex items-center gap-2"><input type="checkbox" name="soundType" value="Pop"> Pop</label>
+              </div>
+            </div>
 
-  <div class="grid sm:grid-cols-2 gap-6 mb-6">
-    <div>
-      <label class="block mb-2 font-semibold">Rhythm</label>
-      <select id="rhythm" name="rhythm"
-        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-        <option>Constant</option>
-        <option>Intermittent</option>
-        <option>With vehicle speed</option>
-        <option>With engine RPM</option>
-        <option>On/off with steering</option>
-      </select>
-    </div>
-    <div>
-      <label class="block mb-2 font-semibold">Duration</label>
-      <select id="duration" name="duration"
-        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-        <option>&lt; 1 sec (brief)</option>
-        <option>1–3 sec (short)</option>
-        <option>&gt; 3 sec (sustained)</option>
-        <option>Continuous</option>
-      </select>
-    </div>
-  </div>
+            <div class="grid sm:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label class="block mb-2 font-semibold">Rhythm</label>
+                <select id="rhythm" name="rhythm" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  <option>Constant</option>
+                  <option>Intermittent</option>
+                  <option>With vehicle speed</option>
+                  <option>With engine RPM</option>
+                  <option>On/off with steering</option>
+                </select>
+              </div>
+              <div>
+                <label class="block mb-2 font-semibold">Duration</label>
+                <select id="duration" name="duration" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  <option>&lt; 1 sec (brief)</option>
+                  <option>1–3 sec (short)</option>
+                  <option>&gt; 3 sec (sustained)</option>
+                  <option>Continuous</option>
+                </select>
+              </div>
+            </div>
 
-  <div class="grid sm:grid-cols-3 gap-6 mb-6">
-    <div>
-      <label class="block mb-2 font-semibold">Pitch</label>
-      <input id="pitch" name="pitch" type="range" min="1" max="5" value="3" class="w-full">
-      <div class="flex justify-between text-xs text-gray-500 mt-1"><span>Low</span><span>High</span></div>
-    </div>
-    <div>
-      <label class="block mb-2 font-semibold">Speed range</label>
-      <select id="speedRange" name="speedRange"
-        class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-        <option>0–20 km/h</option>
-        <option>20–60 km/h</option>
-        <option>60+ km/h</option>
-        <option>Any speed</option>
-      </select>
-    </div>
-    <div>
-      <label class="block mb-2 font-semibold">Severity (1–5)</label>
-      <input id="severity" name="severity" type="range" min="1" max="5" value="3" class="w-full">
-      <div class="flex justify-between text-xs text-gray-500 mt-1"><span>Low</span><span>High</span></div>
-    </div>
-  </div>
+            <div class="grid sm:grid-cols-3 gap-6 mb-6">
+              <div>
+                <label class="block mb-2 font-semibold">Pitch</label>
+                <input id="pitch" name="pitch" type="range" min="1" max="5" value="3" class="w-full">
+                <div class="flex justify-between text-xs text-gray-500 mt-1"><span>Low</span><span>High</span></div>
+              </div>
+              <div>
+                <label class="block mb-2 font-semibold">Speed range</label>
+                <select id="speedRange" name="speedRange" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                  <option>0–20 km/h</option>
+                  <option>20–60 km/h</option>
+                  <option>60+ km/h</option>
+                  <option>Any speed</option>
+                </select>
+              </div>
+              <div>
+                <label class="block mb-2 font-semibold">Severity (1–5)</label>
+                <input id="severity" name="severity" type="range" min="1" max="5" value="3" class="w-full">
+                <div class="flex justify-between text-xs text-gray-500 mt-1"><span>Low</span><span>High</span></div>
+              </div>
+            </div>
 
-  <!-- ADVANCED (optional) -->
-  <details class="mb-6">
-    <summary class="cursor-pointer text-blue-700 font-semibold text-lg">Advanced details (optional) ▼</summary>
-    <div class="mt-4 grid sm:grid-cols-2 gap-6">
-      <div>
-        <label class="block mb-2 font-semibold">Vehicle mileage</label>
-        <input id="mileage" name="mileage" type="number" min="0" placeholder="e.g. 125000"
-          class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      </div>
-      <div>
-        <label class="block mb-2 font-semibold">Transmission</label>
-        <select id="transmission" name="transmission"
-          class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-          <option>Automatic</option>
-          <option>Manual</option>
-          <option>CVT</option>
-          <option>Unknown</option>
-        </select>
-      </div>
-      <div>
-        <label class="block mb-2 font-semibold">Fuel type</label>
-        <select id="fuel" name="fuel"
-          class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-          <option>Gasoline</option>
-          <option>Diesel</option>
-          <option>Hybrid</option>
-          <option>EV</option>
-          <option>Unknown</option>
-        </select>
-      </div>
-      <div>
-        <label class="block mb-2 font-semibold">Any warning lights?</label>
-        <div class="grid grid-cols-2 gap-2 text-sm">
-          <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Check Engine"> Check Engine</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="ABS"> ABS</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Brake"> Brake</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Oil"> Oil</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Battery"> Battery</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="None"> None</label>
+            <!-- ADVANCED (optional) -->
+            <details class="mb-6">
+              <summary class="cursor-pointer text-blue-700 font-semibold text-lg">Advanced details (optional) ▼</summary>
+              <div class="mt-4 grid sm:grid-cols-2 gap-6">
+                <div>
+                  <label class="block mb-2 font-semibold">Vehicle mileage</label>
+                  <input id="mileage" name="mileage" type="number" min="0" placeholder="e.g. 125000" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div>
+                  <label class="block mb-2 font-semibold">Transmission</label>
+                  <select id="transmission" name="transmission" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <option>Automatic</option>
+                    <option>Manual</option>
+                    <option>CVT</option>
+                    <option>Unknown</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block mb-2 font-semibold">Fuel type</label>
+                  <select id="fuel" name="fuel" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <option>Gasoline</option>
+                    <option>Diesel</option>
+                    <option>Hybrid</option>
+                    <option>EV</option>
+                    <option>Unknown</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block mb-2 font-semibold">Any warning lights?</label>
+                  <div class="grid grid-cols-2 gap-2 text-sm">
+                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Check Engine"> Check Engine</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="ABS"> ABS</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Brake"> Brake</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Oil"> Oil</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="Battery"> Battery</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="warning" value="None"> None</label>
+                  </div>
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block mb-2 font-semibold">Recent events</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Hit pothole / curb"> Hit pothole / curb</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Recent service / repair"> Recent service / repair</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="After heavy rain / car wash"> After heavy rain / car wash</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Towed heavy load"> Towed heavy load</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Long storage / sat unused"> Long storage / sat unused</label>
+                    <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Refueled recently"> Refueled recently</label>
+                  </div>
+                </div>
+                <div>
+                  <label class="block mb-2 font-semibold">OBD-II code (if any)</label>
+                  <input id="obdCode" name="obdCode" type="text" placeholder="e.g. P0301" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                </div>
+                <div>
+                  <label class="block mb-2 font-semibold">Reproducible?</label>
+                  <select id="reproducible" name="reproducible" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <option>Always</option>
+                    <option>Often</option>
+                    <option>Sometimes</option>
+                    <option>Rarely</option>
+                  </select>
+                </div>
+              </div>
+            </details>
+
+            <!-- Notes -->
+            <div class="mb-6">
+              <label for="notes" class="block mb-2 font-semibold">Any other notes?</label>
+              <textarea id="notes" name="notes" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none" placeholder="Optional..."></textarea>
+            </div>
+
+            <!-- Vehicle make/model -->
+            <div class="mb-2">
+              <label for="makeModel" class="block mb-2 font-semibold">Vehicle make and model:</label>
+              <input type="text" id="makeModel" name="makeModel" placeholder="e.g. Toyota Corolla 2016" class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="sm:col-span-2">
-        <label class="block mb-2 font-semibold">Recent events</label>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-          <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Hit pothole / curb"> Hit pothole / curb</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Recent service / repair"> Recent service / repair</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="After heavy rain / car wash"> After heavy rain / car wash</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Towed heavy load"> Towed heavy load</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Long storage / sat unused"> Long storage / sat unused</label>
-          <label class="flex items-center gap-2"><input type="checkbox" name="recent" value="Refueled recently"> Refueled recently</label>
-        </div>
-      </div>
-      <div>
-        <label class="block mb-2 font-semibold">OBD-II code (if any)</label>
-        <input id="obdCode" name="obdCode" type="text" placeholder="e.g. P0301"
-          class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      </div>
-      <div>
-        <label class="block mb-2 font-semibold">Reproducible?</label>
-        <select id="reproducible" name="reproducible"
-          class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
-          <option>Always</option>
-          <option>Often</option>
-          <option>Sometimes</option>
-          <option>Rarely</option>
-        </select>
-      </div>
-    </div>
-  </details>
-
-  <!-- Notes -->
-  <div class="mb-6">
-    <label for="notes" class="block mb-2 font-semibold">Any other notes?</label>
-    <textarea id="notes" name="notes" class="w-full p-3 rounded-lg border border-gray-300
-      focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none" placeholder="Optional..."></textarea>
-  </div>
-
-  <!-- Vehicle make/model (gardé ici pour regrouper) -->
-  <div class="mb-2">
-    <label for="makeModel" class="block mb-2 font-semibold">Vehicle make and model:</label>
-    <input type="text" id="makeModel" name="makeModel" placeholder="e.g. Toyota Corolla 2016"
-      class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-  </div>
-</div>
-
+      </section>
 
       <!-- Draft status + clear -->
       <div class="mt-6 flex items-center justify-between">
-        <p id="draftStatus" class="text-sm text-gray-500">
-          Drafts auto-save locally as you type.
-        </p>
-        <button type="button" id="clearDraftBtn" class="text-sm text-blue-600 hover:underline">
-          Clear draft
-        </button>
+        <p id="draftStatus" class="text-sm text-gray-500">Drafts auto-save locally as you type.</p>
+        <button type="button" id="clearDraftBtn" class="text-sm text-blue-600 hover:underline">Clear draft</button>
       </div>
 
       <!-- Submit Button -->
       <div class="flex justify-center mt-10">
         <button
           type="submit"
-          class="bg-blue-600 bg-opacity-80 backdrop-blur-md text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700 hover:bg-opacity-100 hover:scale-105 transform transition duration-300 ease-in-out ring-1 ring-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+          class="bg-blue-600 bg-opacity-80 backdrop-blur-md text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700 hover:bg-opacity-100 hover:scale-105 transform transition duration-300 ease-in-out ring-1 ring-blue-300"
         >
           Diagnose
         </button>
@@ -442,7 +414,7 @@
   <span class="ml-3 text-blue-600 font-medium">Analyzing sound...</span>
 </div>
 
-<!-- AI Diagnosis -->
+<!-- AI Diagnosis + PDF button -->
 <div id="diagnosisResult" class="mt-10 hidden">
   <div class="bg-white border border-gray-300 rounded-xl shadow-lg p-6 space-y-4 max-w-3xl mx-auto">
     <h2 class="text-2xl font-semibold flex items-center gap-2">🧠 AI Diagnosis</h2>
@@ -451,25 +423,26 @@
     </p>
     <div id="diagnosisContent" class="text-gray-800 leading-relaxed whitespace-pre-wrap"></div>
     <div id="diagnosisSuggestions" class="mt-4"></div>
+    <div class="flex justify-end">
+      <button id="downloadPdfBtn" class="px-4 py-2 text-sm bg-gray-800 text-white rounded hover:bg-black">
+        ⬇️ Download PDF report
+      </button>
+    </div>
   </div>
 </div>
 
 <!-- Diagnosis History -->
-<section id="history" class="mt-10 max-w-3xl mx-auto px-4">
+<div class="mt-10 max-w-3xl mx-auto" id="history">
   <details class="bg-white shadow-md rounded-lg p-4">
     <summary class="cursor-pointer text-blue-700 font-semibold text-lg hover:underline">
       View past diagnoses
     </summary>
     <div class="flex justify-end mb-2">
-      <button id="clearHistoryButton" class="text-red-600 hover:underline text-sm">
-        🗑️ Clear History
-      </button>
+      <button id="clearHistoryButton" class="text-red-600 hover:underline text-sm">🗑️ Clear History</button>
     </div>
     <div id="historyList" class="mt-4 text-sm text-gray-800 space-y-4"></div>
   </details>
-</section>
-
-<script src="script.js"></script>
+</div>
 
 <!-- About Section -->
 <section id="about" class="bg-white py-12 border-t border-gray-200 mt-24">
@@ -493,13 +466,12 @@
 
     <button
       id="findGaragesBtn"
-      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition"
     >
       🔍 Find garages near me
     </button>
 
     <div id="map" class="mt-8 w-full h-[500px] rounded-lg shadow-md"></div>
-
     <div id="garageList" class="mt-10 text-left space-y-4 max-w-3xl mx-auto"></div>
   </div>
 </section>
@@ -519,41 +491,32 @@
 <!-- ✅ API GOOGLE MAPS -->
 <script>
   let map;
-
   async function initMap() {
     map = new google.maps.Map(document.getElementById("map"), {
       center: { lat: 45.5017, lng: -73.5673 },
       zoom: 13,
     });
   }
-
   function calculateDistance(origin, destination) {
-    const R = 6371e3; // Earth radius in meters
+    const R = 6371e3;
     const φ1 = origin.lat * Math.PI/180;
     const φ2 = destination.lat() * Math.PI/180;
     const Δφ = (destination.lat() - origin.lat) * Math.PI/180;
     const Δλ = (destination.lng() - origin.lng) * Math.PI/180;
-
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
+    const a = Math.sin(Δφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(Δλ/2)**2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c / 1000; // km
+    return R * c / 1000;
   }
-
   document.getElementById("findGaragesBtn").addEventListener("click", async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
         map.setCenter(userLocation);
-
         const service = new google.maps.places.PlacesService(map);
         const request = { location: userLocation, radius: 10000, type: "car_repair", keyword: "garage" };
-
         service.nearbySearch(request, (results, status) => {
           const garageList = document.getElementById("garageList");
           garageList.innerHTML = "";
-
           if (status === google.maps.places.PlacesServiceStatus.OK) {
             const prioritized = results
               .map((place) => {
@@ -562,20 +525,15 @@
                 const hasGarageKeyword = name.includes("garage") || name.includes("atelier");
                 return { ...place, distance, hasGarageKeyword };
               })
-              .sort((a, b) => {
-                if (a.hasGarageKeyword !== b.hasGarageKeyword) return b.hasGarageKeyword - a.hasGarageKeyword;
-                return a.distance - b.distance;
-              });
+              .sort((a, b) => (a.hasGarageKeyword !== b.hasGarageKeyword) ? (b.hasGarageKeyword - a.hasGarageKeyword) : (a.distance - b.distance));
 
             prioritized.forEach((place) => {
               new google.maps.Marker({ position: place.geometry.location, map, title: place.name });
-
               const name = place.name;
               const address = place.vicinity || "Address not available";
               const rating = place.rating ? `⭐ ${place.rating}/5` : "No rating";
               const distance = place.distance.toFixed(1);
               const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
-
               const div = document.createElement("div");
               div.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
               div.innerHTML = `
@@ -587,8 +545,7 @@
               `;
               garageList.appendChild(div);
             });
-
-            if (prioritized.length === 0) {
+            if (!prioritized.length) {
               garageList.innerHTML = `<p class="text-gray-600 text-center">No open garages found near you.</p>`;
             }
           } else {
@@ -596,35 +553,23 @@
             alert("An error occurred while fetching nearby garages.");
           }
         });
-      }, () => {
-        alert("Unable to retrieve your location. Please allow location access.");
-      });
-    } else {
-      alert("Geolocation not supported by this browser.");
-    }
+      }, () => { alert("Unable to retrieve your location. Please allow location access."); });
+    } else { alert("Geolocation not supported by this browser."); }
   });
 </script>
 
-<!-- 🔑 Clé API avec callback -->
+<!-- 🔑 Google Maps SDK -->
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&libraries=places&callback=initMap"
-  async
-  defer
-></script>
+  async defer></script>
 
 <!-- 🛡️ Consent Banner -->
 <div id="consent-banner" class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-300 p-4 shadow-lg z-50">
   <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm text-gray-800">
-    <p class="mb-2 md:mb-0">
-      We use cookies and Google Analytics to improve your experience. By clicking “Accept”, you agree to this use.
-    </p>
+    <p class="mb-2 md:mb-0">We use cookies and Google Analytics to improve your experience. By clicking “Accept”, you agree to this use.</p>
     <div class="flex space-x-3">
-      <button id="acceptCookies" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-        Accept
-      </button>
-      <button id="declineCookies" class="text-blue-600 hover:underline">
-        Decline
-      </button>
+      <button id="acceptCookies" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Accept</button>
+      <button id="declineCookies" class="text-blue-600 hover:underline">Decline</button>
     </div>
   </div>
 </div>
@@ -632,7 +577,6 @@
   const hasConsent = localStorage.getItem("cookieConsent");
   if (hasConsent === "accepted") { loadAnalytics(); }
   else if (hasConsent === "declined") { document.getElementById("consent-banner").style.display = "none"; }
-
   document.getElementById("acceptCookies").addEventListener("click", () => {
     localStorage.setItem("cookieConsent", "accepted");
     document.getElementById("consent-banner").style.display = "none";
@@ -642,13 +586,11 @@
     localStorage.setItem("cookieConsent", "declined");
     document.getElementById("consent-banner").style.display = "none";
   });
-
   function loadAnalytics() {
     const script1 = document.createElement('script');
     script1.async = true;
     script1.src = 'https://www.googletagmanager.com/gtag/js?id=G-1FL8JMYNX0';
     document.head.appendChild(script1);
-
     const script2 = document.createElement('script');
     script2.innerHTML = `
       window.dataLayer = window.dataLayer || [];
@@ -666,94 +608,148 @@
   This site is currently in <strong>beta</strong>. Some features may be incomplete or unstable.
 </div>
 <script>
-  setTimeout(() => {
-    const toast = document.getElementById('betaToast');
-    if (toast) toast.remove();
-  }, 6000);
+  setTimeout(() => { const toast = document.getElementById('betaToast'); if (toast) toast.remove(); }, 6000);
 </script>
 
-<!-- 🧠 Auto-save draft (localStorage) -->
+<!-- 🧠 Auto-save draft v2 + payload builder (doit être AVANT script.js) -->
 <script>
 (() => {
-  const DRAFT_KEY = "mas_draft_v1";
+  const DRAFT_KEY = "mas_draft_v2";
   const form = document.getElementById("diagnosisForm");
   if (!form) return;
 
+  const $ = (id) => document.getElementById(id);
+  const getChecks = (name) => [...form.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
+  const setChecks = (name, values=[]) => {
+    const set = new Set(values || []);
+    form.querySelectorAll(`input[name="${name}"]`).forEach(el => el.checked = set.has(el.value));
+  };
+
   const fields = {
-    textInput: document.getElementById("textInput"),
-    location: document.getElementById("location"),
-    situation: document.getElementById("situation"),
-    makeModel: document.getElementById("makeModel"),
-    notes: document.getElementById("notes"),
+    textInput: $("textInput"),
+    location: $("location"),
+    situation: $("situation"),
+    rhythm: $("rhythm"),
+    duration: $("duration"),
+    pitch: $("pitch"),
+    speedRange: $("speedRange"),
+    severity: $("severity"),
+    mileage: $("mileage"),
+    transmission: $("transmission"),
+    fuel: $("fuel"),
+    obdCode: $("obdCode"),
+    reproducible: $("reproducible"),
+    makeModel: $("makeModel"),
+    notes: $("notes"),
   };
 
-  const statusEl = document.getElementById("draftStatus");
+  const statusEl = $("draftStatus");
   const setStatus = (msg) => { if (statusEl) statusEl.textContent = msg; };
-
-  const setSelectIfOptionExists = (selectEl, value) => {
-    if (!selectEl || !value) return;
-    const ok = Array.from(selectEl.options).some(o => (o.value || o.textContent) === value);
-    if (ok) selectEl.value = value;
-  };
 
   function loadDraft() {
     try {
       const raw = localStorage.getItem(DRAFT_KEY);
       if (!raw) return;
       const d = JSON.parse(raw);
-
-      if (fields.textInput) fields.textInput.value = d.description || "";
-      setSelectIfOptionExists(fields.location, d.location);
-      setSelectIfOptionExists(fields.situation, d.situation);
-      if (fields.makeModel) fields.makeModel.value = d.makeModel || "";
-      if (fields.notes) fields.notes.value = d.notes || "";
-
+      Object.entries(fields).forEach(([k, el]) => { if (el && d[k] != null) el.value = d[k]; });
+      setChecks("when", d.when);
+      setChecks("soundType", d.soundType);
+      setChecks("warning", d.warning);
+      setChecks("recent", d.recent);
       setStatus("Draft restored.");
-    } catch (_) {}
+    } catch {}
   }
 
   let saveTimer;
-  function scheduleSave() {
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(saveDraft, 500);
-  }
-
+  function scheduleSave(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveDraft, 400); }
   function saveDraft() {
     try {
       const data = {
         description: fields.textInput?.value || "",
         location: fields.location?.value || "",
         situation: fields.situation?.value || "",
+        when: getChecks("when"),
+        soundType: getChecks("soundType"),
+        rhythm: fields.rhythm?.value || "",
+        duration: fields.duration?.value || "",
+        pitch: fields.pitch?.value || "",
+        speedRange: fields.speedRange?.value || "",
+        severity: fields.severity?.value || "",
+        mileage: fields.mileage?.value || "",
+        transmission: fields.transmission?.value || "",
+        fuel: fields.fuel?.value || "",
+        warning: getChecks("warning"),
+        recent: getChecks("recent"),
+        obdCode: fields.obdCode?.value || "",
+        reproducible: fields.reproducible?.value || "",
         makeModel: fields.makeModel?.value || "",
         notes: fields.notes?.value || "",
-        ts: Date.now()
+        ts: Date.now(),
       };
       localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
       setStatus("Draft saved.");
-    } catch (_) {}
+    } catch {}
   }
-
   function clearDraft() {
-    try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
+    try { localStorage.removeItem(DRAFT_KEY); } catch {}
     form.reset();
+    ["when","soundType","warning","recent"].forEach(name => {
+      form.querySelectorAll(`input[name="${name}"]`).forEach(el => el.checked = false);
+    });
     setStatus("Draft cleared.");
   }
 
-  Object.values(fields).forEach(el => {
-    if (!el) return;
-    el.addEventListener("input", scheduleSave);
-    el.addEventListener("change", scheduleSave);
+  Object.values(fields).forEach(el => { if (!el) return; el.addEventListener("input", scheduleSave); el.addEventListener("change", scheduleSave); });
+  ["when","soundType","warning","recent"].forEach(name => {
+    form.querySelectorAll(`input[name="${name}"]`).forEach(el => el.addEventListener("change", scheduleSave));
   });
 
   document.getElementById("clearDraftBtn")?.addEventListener("click", clearDraft);
+  form.addEventListener("submit", () => { try { localStorage.removeItem(DRAFT_KEY); } catch {} });
 
-  form.addEventListener("submit", () => {
-    try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
-  });
+  // ---- Export global: payload structuré pour OpenAI
+  window.buildDiagnosisPayload = function buildDiagnosisPayload() {
+    const audioAttached = !!document.getElementById("audioFile")?.files?.length || !!document.getElementById("recordedAudio")?.recordedBlob;
+    return {
+      description: fields.textInput?.value?.trim() || "",
+      audioAttached,
+      location: fields.location?.value || null,
+      primarySituation: fields.situation?.value || null,
+      situations: [...form.querySelectorAll('input[name="when"]:checked')].map(el => el.value),
+      soundProfile: {
+        labels: [...form.querySelectorAll('input[name="soundType"]:checked')].map(el => el.value),
+        rhythm: fields.rhythm?.value || null,
+        duration: fields.duration?.value || null,
+        pitchLevel: Number(fields.pitch?.value || 0),
+        severityLevel: Number(fields.severity?.value || 0),
+      },
+      driving: {
+        speedRange: fields.speedRange?.value || null,
+        reproducible: fields.reproducible?.value || null,
+      },
+      vehicle: {
+        makeModel: fields.makeModel?.value?.trim() || null,
+        mileage: fields.mileage?.value ? Number(fields.mileage.value) : null,
+        transmission: fields.transmission?.value || null,
+        fuel: fields.fuel?.value || null,
+        obdCode: fields.obdCode?.value?.trim() || null,
+        warningLights: [...form.querySelectorAll('input[name="warning"]:checked')].map(el => el.value),
+      },
+      recentEvents: [...form.querySelectorAll('input[name="recent"]:checked')].map(el => el.value),
+      notes: fields.notes?.value?.trim() || "",
+      timestamp: new Date().toISOString(),
+    };
+  };
 
   loadDraft();
 })();
 </script>
+
+<!-- jsPDF (pour export PDF) -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+
+<!-- Ton script principal -->
+<script src="script.js"></script>
 
 </body>
 </html>
