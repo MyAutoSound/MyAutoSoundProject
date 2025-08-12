@@ -7,47 +7,13 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
   <style>
-    body {
-      font-family: "Poppins", sans-serif;
-    }
-
-    button {
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    @keyframes micSpin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .fade-slide-up {
-      animation: fadeSlideUp 0.6s ease forwards;
-    }
-
-    @keyframes fadeSlideUp {
-      0% {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-      100% {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .fade-in {
-      animation: fadeIn 0.5s ease forwards;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    body { font-family: "Poppins", sans-serif; }
+    button { transition: all 0.3s ease; }
+    button:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+    .fade-slide-up { animation: fadeSlideUp 0.6s ease forwards; }
+    @keyframes fadeSlideUp { 0%{opacity:0;transform:translateY(15px)}100%{opacity:1;transform:translateY(0)} }
+    .fade-in { animation: fadeIn 0.5s ease forwards; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
   </style>
 </head>
 <body class="min-h-screen bg-gray-100 bg-opacity-90 text-gray-800">
@@ -57,28 +23,30 @@
   <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
     <div class="text-xl font-bold text-blue-600">MyAutoSound</div>
     <nav class="space-x-6 text-sm md:text-base">
-      <a href="#diagnosisForm" class="text-gray-700 hover:text-blue-600">Diagnose</a>
-      <a href="#about" class="text-gray-700 hover:text-blue-600">About</a>
-      <a href="#history" class="text-gray-700 hover:text-blue-600">History</a>
-      <a href="tutorials.html" class="text-gray-700 hover:text-blue-600">Tutorials</a>
+      <a href="#diagnose" class="text-gray-700 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">Diagnose</a>
+      <a href="#about" class="text-gray-700 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">About</a>
+      <a href="#history" class="text-gray-700 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">History</a>
+      <a href="tutorials.html" class="text-gray-700 hover:text-blue-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">Tutorials</a>
     </nav>
   </div>
 </header>
 
 <!-- Hero Section -->
 <section class="relative bg-[url('https://images.unsplash.com/photo-1583126162406-643011b3f69f?q=80&w=1103&auto=format&fit=crop&ixlib=rb-4.1.0')] bg-center bg-no-repeat bg-cover py-28 px-6">
-  <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+  <!-- overlay + gradient pour lisibilité -->
+  <div class="absolute inset-0 bg-black/40"></div>
+  <div class="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 via-black/30 to-transparent"></div>
 
   <div class="relative z-10 max-w-5xl mx-auto grid md:grid-cols-2 items-center gap-8 text-white">
     <div>
-      <h1 class="text-3xl md:text-4xl font-extrabold drop-shadow-lg mb-4 fade-slide-up" style="animation-delay: 0.1s">
+      <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight drop-shadow-lg mb-4 fade-slide-up" style="animation-delay: 0.1s">
         Identify Unusual Car Noises
       </h1>
       <p class="text-lg mb-6 drop-shadow fade-slide-up" style="animation-delay: 0.2s">
         Diagnose potential issues with your vehicle and avoid unnecessary repairs.
       </p>
 
-      <div class="space-y-6">
+      <div class="space-y-4">
         <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.3s">
           <span class="text-2xl">👂</span>
           <p class="drop-shadow"><strong>Describe or record the sound</strong></p>
@@ -91,25 +59,34 @@
           <span class="text-2xl">🛠️</span>
           <p class="drop-shadow"><strong>Follow easy tutorials to fix or inspect it</strong></p>
         </div>
-        <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.7s">
-          <span class="text-2xl">🎓</span>
-          <p class="drop-shadow">
-            <a href="tutorials.html" class="text-blue-300 underline hover:text-white">
-              <strong> Fix ourself </strong>
-            </a>
-          </p>
-        </div>
-
         <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.6s">
           <span class="text-2xl">📍</span>
           <p class="drop-shadow"><strong>Discover top-rated auto repair shops nearby</strong></p>
         </div>
+        <div class="flex items-start gap-3 fade-slide-up" style="animation-delay: 0.7s">
+          <span class="text-2xl">🎓</span>
+          <p class="drop-shadow">
+            <a href="tutorials.html" class="text-blue-300 underline hover:text-white">
+              <strong>Fix it yourself</strong>
+            </a>
+          </p>
+        </div>
+      </div>
+
+      <!-- CTA principaux -->
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <a href="#diagnose" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+          🚗 Start diagnosis
+        </a>
+        <a href="tutorials.html" class="inline-flex items-center gap-2 bg-white/90 hover:bg-white text-gray-800 font-semibold px-6 py-3 rounded-lg shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+          🎓 See tutorials
+        </a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- 🛈 Diagnostic Tips (added) -->
+<!-- 🛈 Diagnostic Tips -->
 <section class="max-w-4xl mx-auto bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-md shadow mb-8 mt-12">
   <h2 class="text-xl font-bold text-yellow-800 mb-2">💡 How to Get the Most Accurate Diagnosis</h2>
   <ul class="list-disc list-inside text-gray-700 space-y-1">
@@ -139,14 +116,16 @@
           background-repeat: no-repeat;
         "
       >
-        <div class="absolute inset-0 bg-black bg-opacity-40 pointer-events-none"></div>
+        <div class="absolute inset-0 bg-black/40 pointer-events-none"></div>
 
-        <div class="relative px-6 flex flex-col lg:flex-row gap-8 z-10">
+        <!-- grille au lieu de flex pour une meilleure structure -->
+        <div class="relative px-6 grid gap-8 lg:grid-cols-2 z-10">
           <!-- Step 1 -->
           <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
-            <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
-              📝 Step 1 – Describe the Sound
-            </h2>
+            <div class="flex items-center gap-3 mb-3">
+              <span class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">Step 1</span>
+              <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">📝 Describe the sound</h2>
+            </div>
 
             <!-- Description -->
             <div class="mb-6">
@@ -166,7 +145,7 @@
               <button
                 id="recordButton"
                 type="button"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
               >
                 🎤 Start Recording
               </button>
@@ -182,7 +161,7 @@
                 id="audioFile"
                 name="audio"
                 accept="audio/*"
-                class="block w-full text-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-white file:bg-blue-600 hover:file:bg-blue-700"
+                class="block w-full text-sm text-gray-800 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-white file:bg-blue-600 hover:file:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
               />
             </div>
 
@@ -192,7 +171,6 @@
                 Example Sounds ▼
               </summary>
               <div class="mt-4 space-y-4 max-h-72 overflow-y-auto pr-2">
-                <!-- Sons exemples -->
                 <div class="flex items-center space-x-3">
                   <label class="w-56 font-semibold">Clunking:</label>
                   <audio controls class="w-full">
@@ -229,9 +207,10 @@
 
           <!-- Step 2 -->
           <div class="flex-1 bg-white/80 backdrop-blur-md p-8 rounded-2xl shadow-xl">
-            <h2 class="text-2xl font-bold text-blue-700 mb-6 flex items-center gap-2">
-              📍 Step 2 – Provide More Details
-            </h2>
+            <div class="flex items-center gap-3 mb-3">
+              <span class="inline-flex items-center rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-xs font-semibold">Step 2</span>
+              <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">📍 Provide more details</h2>
+            </div>
 
             <!-- Location -->
             <div class="mb-6">
@@ -294,7 +273,7 @@
         </div>
       </section>
 
-      <!-- Draft status + clear (added) -->
+      <!-- Draft status + clear -->
       <div class="mt-6 flex items-center justify-between">
         <p id="draftStatus" class="text-sm text-gray-500">
           Drafts auto-save locally as you type.
@@ -308,7 +287,7 @@
       <div class="flex justify-center mt-10">
         <button
           type="submit"
-          class="bg-blue-600 bg-opacity-80 backdrop-blur-md text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700 hover:bg-opacity-100 hover:scale-105 transform transition duration-300 ease-in-out ring-1 ring-blue-300"
+          class="bg-blue-600 bg-opacity-80 backdrop-blur-md text-white font-semibold px-10 py-4 rounded-full shadow-lg hover:bg-blue-700 hover:bg-opacity-100 hover:scale-105 transform transition duration-300 ease-in-out ring-1 ring-blue-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
         >
           Diagnose
         </button>
@@ -337,7 +316,7 @@
 </div>
 
 <!-- Diagnosis History -->
-<div class="mt-10 max-w-3xl mx-auto">
+<section id="history" class="mt-10 max-w-3xl mx-auto px-4">
   <details class="bg-white shadow-md rounded-lg p-4">
     <summary class="cursor-pointer text-blue-700 font-semibold text-lg hover:underline">
       View past diagnoses
@@ -349,10 +328,9 @@
     </div>
     <div id="historyList" class="mt-4 text-sm text-gray-800 space-y-4"></div>
   </details>
-</div>
+</section>
 
 <script src="script.js"></script>
-</div>
 
 <!-- About Section -->
 <section id="about" class="bg-white py-12 border-t border-gray-200 mt-24">
@@ -376,7 +354,7 @@
 
     <button
       id="findGaragesBtn"
-      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition"
+      class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
     >
       🔍 Find garages near me
     </button>
@@ -421,28 +399,18 @@
               Math.cos(φ1) * Math.cos(φ2) *
               Math.sin(Δλ/2) * Math.sin(Δλ/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-    return R * c / 1000; // distance in kilometers
+    return R * c / 1000; // km
   }
 
   document.getElementById("findGaragesBtn").addEventListener("click", async () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
-        const userLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        };
-
+        const userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
         map.setCenter(userLocation);
 
         const service = new google.maps.places.PlacesService(map);
+        const request = { location: userLocation, radius: 10000, type: "car_repair", keyword: "garage" };
 
-        const request = {
-          location: userLocation,
-          radius: 10000,
-          type: "car_repair",
-          keyword: "garage"
-        };
         service.nearbySearch(request, (results, status) => {
           const garageList = document.getElementById("garageList");
           garageList.innerHTML = "";
@@ -456,18 +424,12 @@
                 return { ...place, distance, hasGarageKeyword };
               })
               .sort((a, b) => {
-                if (a.hasGarageKeyword !== b.hasGarageKeyword) {
-                  return b.hasGarageKeyword - a.hasGarageKeyword;
-                }
+                if (a.hasGarageKeyword !== b.hasGarageKeyword) return b.hasGarageKeyword - a.hasGarageKeyword;
                 return a.distance - b.distance;
               });
 
             prioritized.forEach((place) => {
-              new google.maps.Marker({
-                position: place.geometry.location,
-                map,
-                title: place.name,
-              });
+              new google.maps.Marker({ position: place.geometry.location, map, title: place.name });
 
               const name = place.name;
               const address = place.vicinity || "Address not available";
@@ -529,19 +491,14 @@
 </div>
 <script>
   const hasConsent = localStorage.getItem("cookieConsent");
-
-  if (hasConsent === "accepted") {
-    loadAnalytics();
-  } else if (hasConsent === "declined") {
-    document.getElementById("consent-banner").style.display = "none";
-  }
+  if (hasConsent === "accepted") { loadAnalytics(); }
+  else if (hasConsent === "declined") { document.getElementById("consent-banner").style.display = "none"; }
 
   document.getElementById("acceptCookies").addEventListener("click", () => {
     localStorage.setItem("cookieConsent", "accepted");
     document.getElementById("consent-banner").style.display = "none";
     loadAnalytics();
   });
-
   document.getElementById("declineCookies").addEventListener("click", () => {
     localStorage.setItem("cookieConsent", "declined");
     document.getElementById("consent-banner").style.display = "none";
@@ -570,7 +527,6 @@
   This site is currently in <strong>beta</strong>. Some features may be incomplete or unstable.
 </div>
 <script>
-  // Auto-hide the toast after 6 seconds
   setTimeout(() => {
     const toast = document.getElementById('betaToast');
     if (toast) toast.remove();
@@ -590,7 +546,6 @@
     situation: document.getElementById("situation"),
     makeModel: document.getElementById("makeModel"),
     notes: document.getElementById("notes"),
-    // audioFile intentionally ignored (privacy + size)
   };
 
   const statusEl = document.getElementById("draftStatus");
@@ -621,7 +576,7 @@
   let saveTimer;
   function scheduleSave() {
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(saveDraft, 500); // debounce
+    saveTimer = setTimeout(saveDraft, 500);
   }
 
   function saveDraft() {
@@ -645,26 +600,21 @@
     setStatus("Draft cleared.");
   }
 
-  // Listen to changes
   Object.values(fields).forEach(el => {
     if (!el) return;
     el.addEventListener("input", scheduleSave);
     el.addEventListener("change", scheduleSave);
   });
 
-  // Clear button
   document.getElementById("clearDraftBtn")?.addEventListener("click", clearDraft);
 
-  // Clean draft on submit
   form.addEventListener("submit", () => {
     try { localStorage.removeItem(DRAFT_KEY); } catch (_) {}
   });
 
-  // Init
   loadDraft();
 })();
 </script>
 
 </body>
 </html>
-
