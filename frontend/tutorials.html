@@ -7,8 +7,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { font-family: 'Poppins', sans-serif; }
-    /* Les cartes doivent servir d’ancre pour le bouton étoile */
-    .tutorial { position: relative; }
+
+    /* La carte sert d’ancre pour l’étoile */
+    .tutorial{ position: relative; }
+
     /* Lite YouTube embed */
     .yt-lite {
       position: relative; cursor: pointer; border-radius: 0.75rem;
@@ -20,10 +22,15 @@
       position: absolute; inset: 0; display: grid; place-items: center;
       font-size: 48px; background: rgba(0,0,0,.35); color: #fff;
     }
-    /* Favorite star: bien visible (sans dépendre de classes dynamiques) */
-    .fav-btn{position:absolute;top:.5rem;right:.5rem;font-size:26px;line-height:1;color:#9ca3af;transition:transform .15s ease;z-index:10}
-    .fav-btn:hover{transform:scale(1.1)}
-    .fav-btn.is-fav{color:#eab308} /* étoile dorée quand favori */
+
+    /* Etoile de favoris — très visible et au-dessus de l'image */
+    .fav-btn{
+      position:absolute;top:.5rem;right:.5rem;font-size:26px;line-height:1;
+      color:#9ca3af;z-index:10;transition:transform .15s ease;
+      background:rgba(255,255,255,.9);border-radius:.5rem;padding:.15rem .35rem
+    }
+    .fav-btn:hover{ transform:scale(1.1) }
+    .fav-btn.is-fav{ color:#eab308 } /* doré quand favori */
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
@@ -169,7 +176,7 @@
     let items = [];
     const itemsById = new Map();
 
-    // UI: étoile maj
+    // UI: étoile maj (centralisé)
     function updateStarUI(id) {
       const active = FAVS.has(id);
       document.querySelectorAll(`.tutorial[data-id="${id}"] .fav-btn`).forEach(btn => {
@@ -193,11 +200,19 @@
       const btn = document.createElement('button');
       btn.className = 'fav-btn';
       btn.type = 'button';
-      btn.setAttribute('aria-pressed', 'false');
-      btn.title = 'Add to favorites';
-      btn.setAttribute('aria-label', 'Add to favorites');
+
+      // Texte par défaut (affiché immédiatement)
+      const isFav = FAVS.has(item.id);
+      btn.textContent = isFav ? '★' : '☆';
+      if (isFav) btn.classList.add('is-fav');
+      btn.setAttribute('aria-pressed', String(isFav));
+      btn.title = isFav ? 'Remove from favorites' : 'Add to favorites';
+      btn.setAttribute('aria-label', btn.title);
+
       btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleFav(item.id); });
       card.appendChild(btn);
+
+      // Harmonise via la fonction centrale (au cas où)
       updateStarUI(item.id);
     }
 
