@@ -2,7 +2,7 @@ let mediaRecorder;
 let recordedChunks = [];
 let history = [];
 
-// --- Rotating loading messages (nouveau) ---
+// --- Rotating loading messages ---
 let rotTimer = null;
 const rotatingMsgs = [
   "Uploading & securing your audio…",
@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const historyList = document.getElementById("historyList");
   const clearButton = document.getElementById("clearHistoryButton");
   const loadingEl = document.getElementById("loading");
-  const loadingRotating = document.getElementById("loadingRotating"); // <- utilisé pour les messages
+  const loadingRotating = document.getElementById("loadingRotating");
   const submitBtn = diagnosisForm?.querySelector('button[type="submit"]');
   const downloadBtn = document.getElementById('downloadPdfBtn');
 
@@ -76,13 +76,13 @@ document.addEventListener("DOMContentLoaded", () => {
         : buildDiagnosisPayloadFallback();
 
       const fd = new FormData();
-      // Champs “legacy” pour compat backend
+      // Champs “legacy”
       fd.append("description", payload.description || "");
       fd.append("location", payload.location || "");
       fd.append("situation", payload.primarySituation || "");
       fd.append("makeModel", (payload?.vehicle?.makeModel) || "");
       fd.append("notes", payload.notes || "");
-      // Report JSON structuré
+      // Report JSON
       fd.append("report", JSON.stringify(payload));
 
       // Audio: upload > enregistrement
@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderHistory();
   });
 
-  // ---- Export PDF brandé (jsPDF)
+  // ---- Export PDF (jsPDF)
   downloadBtn?.addEventListener('click', downloadPdfReport);
 
   async function downloadPdfReport() {
@@ -264,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
     hr();
     P('This report summarizes your input and the AI’s analysis. It is informational and not a substitute for an inspection by a qualified technician.');
 
-    // ToC page
+    // ToC
     doc.addPage(); drawHeader();
     const tocPage = doc.getCurrentPageInfo().pageNumber;
     H1('Table of Contents');
@@ -350,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
     doc.setPage(tocPage);
     y = 12 + 14;
     H2('Sections');
-    doc.setFont('helvetica','normal'); doc.setFontSize(11); setCol(BRAND.text);
+    doc.setFont('helvetica','normal'); doc.setFontSize(11); setCol('#111827');
     tocEntries.forEach(({ title, page }) => {
       if (y + 8 > pageH - margin) { doc.addPage(); drawHeader(); }
       const line = `${title}`;
@@ -373,8 +373,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (on) {
       loadingEl.classList.remove("hidden");
       submitBtn && (submitBtn.disabled = true);
-
-      // Démarre le message tournant
       if (loadingRotating) {
         let i = 0;
         loadingRotating.textContent = rotatingMsgs[0];
@@ -387,7 +385,6 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       loadingEl.classList.add("hidden");
       submitBtn && (submitBtn.disabled = false);
-      // Stoppe le message tournant
       clearInterval(rotTimer);
       rotTimer = null;
     }
@@ -472,7 +469,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return "text-green-700 font-medium";
   }
 
-  // ---- Fallback builder si le payload builder global n'est pas là
+  // ---- Fallback builder
   function buildDiagnosisPayloadFallback() {
     const $ = (id) => document.getElementById(id);
     const getChecks = (name) => [...document.querySelectorAll(`input[name="${name}"]:checked`)].map(el => el.value);
