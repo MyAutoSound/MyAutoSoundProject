@@ -2,15 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MyAutoSound Tutorials</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Poppins comme sur la home -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
   <style>
     body { font-family: 'Poppins', sans-serif; }
-
-    /* La carte sert d’ancre pour l’étoile */
     .tutorial{ position: relative; }
 
     /* Lite YouTube embed */
@@ -19,66 +16,82 @@
       overflow: hidden; display: block; background-size: cover;
       background-position: center; min-height: 180px;
     }
-    .yt-lite::after {
-      content: "▶";
-      position: absolute; inset: 0; display: grid; place-items: center;
-      font-size: 48px; background: rgba(0,0,0,.35); color: #fff;
-    }
+    .yt-lite::after { content: "▶"; position: absolute; inset: 0; display: grid; place-items: center;
+      font-size: 48px; background: rgba(0,0,0,.35); color: #fff; }
 
-    /* Etoile de favoris — très visible et au-dessus de l'image */
+    /* Favorites */
     .fav-btn{
       position:absolute;top:.5rem;right:.5rem;font-size:26px;line-height:1;
       color:#9ca3af;z-index:10;transition:transform .15s ease;
       background:rgba(255,255,255,.9);border-radius:.5rem;padding:.15rem .35rem
     }
     .fav-btn:hover{ transform:scale(1.1) }
-    .fav-btn.is-fav{ color:#eab308 } /* doré quand favori */
+    .fav-btn.is-fav{ color:#eab308 }
 
-    /* Cartes améliorées (hover/focus cohérents avec la home) */
+    /* Cards */
     .card-ui { transition: transform .15s ease, box-shadow .15s ease; }
     .card-ui:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.08); }
     .card-ui:focus-within { outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,.35); }
-
-    /* Aspect ratio 16/9 pour toutes les vignettes */
     .thumb { aspect-ratio: 16/9; width: 100%; object-fit: cover; border-radius: 0.75rem; }
+
+    /* Badges */
+    .badge{ font-size: .70rem; line-height: 1; padding: .3rem .45rem; border-radius: .375rem; }
+    .badge-cat{ background:#eff6ff; color:#1d4ed8; }
+    .badge-type{ background:#f3f4f6; color:#111827; }
+    .badge-level{ background:#ecfdf5; color:#047857; }
+    .badge-new{ background:#fef3c7; color:#b45309; }
 
     /* Skeletons */
     .skeleton-card { border-radius: 0.75rem; }
+
+    /* Cookie banner simple */
+    #cookieBanner{ position:fixed; left:0; right:0; bottom:0; z-index:60; }
   </style>
 </head>
 <body class="bg-gray-100 text-gray-800 min-h-screen">
 
   <!-- Header -->
   <header class="bg-white shadow-md sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap gap-3 justify-between items-center">
       <h1 class="text-xl font-bold text-blue-700">MyAutoSound Tutorials</h1>
-      <a href="index.html" class="text-sm text-blue-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">← Back to Home</a>
+      <nav class="flex items-center gap-2">
+        <a href="index.html" class="text-sm text-blue-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">← Back to Home</a>
+      </nav>
     </div>
   </header>
 
   <!-- Filters -->
   <section class="max-w-5xl mx-auto px-4 py-8">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
-      <input type="text" id="searchInput" placeholder="Search tutorials..." class="w-full md:w-1/3 p-3 rounded border border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300" />
-
-      <select id="categoryFilter" class="w-full md:w-1/3 p-3 rounded border border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-2">
+      <input type="text" id="searchInput" placeholder="Search tutorials..." class="md:col-span-2 p-3 rounded border border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300" />
+      <select id="categoryFilter" class="p-3 rounded border border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
         <option value="">All Categories</option>
-        <option value="brake">Brake</option>
-        <option value="engine">Engine</option>
-        <option value="suspension">Suspension</option>
-        <option value="steering">Steering</option>
-        <option value="transmission">Transmission</option>
-        <option value="exhaust">Exhaust</option>
-        <option value="vacuum">Vacuum</option>
-        <option value="drivetrain">Drivetrain</option>
+        <option value="brake">Brake</option><option value="engine">Engine</option>
+        <option value="suspension">Suspension</option><option value="steering">Steering</option>
+        <option value="transmission">Transmission</option><option value="exhaust">Exhaust</option>
+        <option value="vacuum">Vacuum</option><option value="drivetrain">Drivetrain</option>
       </select>
-
-      <select id="typeFilter" class="w-full md:w-1/3 p-3 rounded border border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+      <select id="typeFilter" class="p-3 rounded border border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
         <option value="">All Types</option>
-        <option value="video">Video</option>
-        <option value="audio">Audio</option>
-        <option value="pdf">PDF</option>
+        <option value="video">Video</option><option value="audio">Audio</option><option value="pdf">PDF</option>
       </select>
+      <select id="sortSelect" class="p-3 rounded border border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+        <option value="relevance">Sort: Relevance</option>
+        <option value="az">Sort: A → Z</option>
+        <option value="new">Sort: Newest</option>
+        <option value="cat">Sort: Category</option>
+      </select>
+      <label class="inline-flex items-center gap-2 md:col-span-5">
+        <input id="onlyFavs" type="checkbox" class="h-4 w-4 rounded border-gray-300">
+        <span class="text-sm text-gray-700">Show favorites only</span>
+      </label>
+    </div>
+    <div class="flex justify-between items-center text-xs text-gray-500 mb-6">
+      <div id="statsLine"></div>
+      <div class="flex gap-2">
+        <button id="clearFilters" class="underline">Reset filters</button>
+        <button id="copyLink" class="underline">Copy shareable link</button>
+      </div>
     </div>
 
     <!-- ⭐ Favorites -->
@@ -88,49 +101,42 @@
         <button id="clearFavs" class="text-sm text-red-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 rounded">Clear all</button>
       </div>
       <p id="favEmpty" class="text-sm text-gray-500 mb-4">No favorites yet. Click ★ on any card.</p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="favoritesSection"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="favoritesSection" aria-live="polite"></div>
     </div>
 
     <!-- 🎥 Video Tutorials -->
-    <h2 class="text-2xl font-bold text-blue-800 mt-12 mb-6">🎥 Video Tutorials</h2>
+    <h2 class="text-2xl font-bold text-blue-800 mt-12 mb-2">🎥 Video Tutorials</h2>
+    <p class="text-xs text-gray-500 mb-4" id="countVideos"></p>
 
     <!-- 🔧 Fix it at home -->
     <h3 class="text-xl font-bold text-blue-700 mt-8 mb-4">🔧 Fix it at home</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="videoFix"></div>
-    <div class="flex justify-center mt-4">
-      <button id="more-vfix" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button>
-    </div>
+    <div class="flex justify-center mt-4"><button id="more-vfix" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button></div>
 
     <!-- 👂 Inspect your car noise -->
     <h3 class="text-xl font-bold text-blue-700 mt-8 mb-4">👂 Inspect your car noise</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="videoInspect"></div>
-    <div class="flex justify-center mt-4">
-      <button id="more-vins" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button>
-    </div>
+    <div class="flex justify-center mt-4"><button id="more-vins" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button></div>
 
     <!-- 🧼 Car maintenance you should do at home -->
     <h3 class="text-xl font-bold text-blue-700 mt-8 mb-4">🧼 Car maintenance you should do at home</h3>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="videoMaintenance"></div>
-    <div class="flex justify-center mt-4">
-      <button id="more-vmaint" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button>
-    </div>
+    <div class="flex justify-center mt-4"><button id="more-vmaint" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button></div>
 
     <!-- 🔉 Audio Examples -->
-    <h2 class="text-2xl font-bold text-blue-800 mt-12 mb-6">🔉 Sound Examples</h2>
+    <h2 class="text-2xl font-bold text-blue-800 mt-12 mb-2">🔉 Sound Examples</h2>
+    <p class="text-xs text-gray-500 mb-4" id="countAudio"></p>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="audioSection"></div>
-    <div class="flex justify-center mt-4">
-      <button id="more-audio" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button>
-    </div>
+    <div class="flex justify-center mt-4"><button id="more-audio" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button></div>
 
     <!-- 📄 PDF Guides -->
-    <h2 class="text-2xl font-bold text-blue-800 mt-12 mb-6">📄 PDF Guides</h2>
+    <h2 class="text-2xl font-bold text-blue-800 mt-12 mb-2">📄 PDF Guides</h2>
+    <p class="text-xs text-gray-500 mb-4" id="countPdf"></p>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="pdfSection"></div>
-    <div class="flex justify-center mt-4">
-      <button id="more-pdf" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button>
-    </div>
+    <div class="flex justify-center mt-4"><button id="more-pdf" class="px-4 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">Load more</button></div>
 
     <!-- Status / errors -->
-    <div id="statusMsg" class="mt-8 text-center text-sm text-gray-500"></div>
+    <div id="statusMsg" class="mt-8 text-center text-sm text-gray-500" aria-live="polite"></div>
   </section>
 
   <!-- Footer -->
@@ -143,14 +149,33 @@
     <div id="toastBox" class="rounded-lg shadow-lg px-4 py-2 text-sm font-medium bg-gray-900 text-white"></div>
   </div>
 
-  <!-- ================== Loader from tutorials.json + Lite YouTube + Load More + Favorites + Skeletons + Toast ================== -->
-  <script>
-  (async () => {
-    const JSON_PATH = 'tutorials.json';   // ou 'data/tutorials.json'
-    const STEP = 6;                       // pagination par section
-    const FAV_KEY = 'mas_favs_v1';        // clé localStorage
+  <!-- Cookie banner -->
+  <div id="cookieBanner" class="hidden">
+    <div class="max-w-4xl mx-auto m-4 p-4 bg-white border border-gray-200 rounded-lg shadow flex flex-wrap items-center gap-3">
+      <p class="text-sm text-gray-700 flex-1">
+        We use cookies/localStorage to remember your favorites and, if you accept, to embed YouTube videos.
+      </p>
+      <div class="flex gap-2">
+        <button id="cookieAccept" class="px-3 py-2 text-sm rounded bg-blue-600 text-white">Accept</button>
+        <button id="cookieDecline" class="px-3 py-2 text-sm rounded bg-gray-200">Decline</button>
+      </div>
+    </div>
+  </div>
 
-    // Containers
+  <!-- ================== Script ================== -->
+  <script>
+  // --- VSCode/TS/ESLint sanity header ---
+  // @ts-nocheck
+  /* eslint-env browser, es2021 */
+  /* global window, document, localStorage, navigator, history, location */
+
+  (async () => {
+    const JSON_PATH = 'tutorials.json';
+    const STEP = 6;
+    const FAV_KEY = 'mas_favs_v1';
+    const fallbackThumb = 'assets/img/default-sound.jpg';
+
+    // DOM refs
     const containers = {
       vfix: document.getElementById('videoFix'),
       vins: document.getElementById('videoInspect'),
@@ -158,6 +183,11 @@
       audio: document.getElementById('audioSection'),
       pdf: document.getElementById('pdfSection'),
       favs: document.getElementById('favoritesSection')
+    };
+    const counts = {
+      videos: document.getElementById('countVideos'),
+      audio: document.getElementById('countAudio'),
+      pdf: document.getElementById('countPdf')
     };
     const moreBtns = {
       vfix: document.getElementById('more-vfix'),
@@ -171,23 +201,34 @@
     const favEmpty = document.getElementById('favEmpty');
     const clearFavsBtn = document.getElementById('clearFavs');
     const statusMsg = document.getElementById('statusMsg');
+    const statsLine = document.getElementById('statsLine');
 
     // Filters
     const searchInput = document.getElementById('searchInput');
     const categoryFilter = document.getElementById('categoryFilter');
     const typeFilter = document.getElementById('typeFilter');
+    const sortSelect = document.getElementById('sortSelect');
+    const onlyFavs = document.getElementById('onlyFavs');
+    const clearFilters = document.getElementById('clearFilters');
+    const copyLink = document.getElementById('copyLink');
 
     // Consent
-    const hasConsent = localStorage.getItem("cookieConsent") === "accepted";
+    const cookieBanner = document.getElementById('cookieBanner');
+    const cookieAccept = document.getElementById('cookieAccept');
+    const cookieDecline = document.getElementById('cookieDecline');
 
     // Helpers
-    const fallbackThumb = 'assets/img/default-sound.jpg';
-    const imgHTML = (src, alt) => `<img src="${src || fallbackThumb}" alt="${alt}" class="thumb mb-4" loading="lazy" />`;
-    const ytThumb = (ytId) => `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+    function show(el){ if(el){ el.classList.remove('hidden'); } }
+    function hide(el){ if(el){ el.classList.add('hidden'); } }
+    function on(el, ev, fn){ if(el){ el.addEventListener(ev, fn); } }
+    const imgHTML = function(src, alt){ return '<img src="'+(src || fallbackThumb)+'" alt="'+alt+'" class="thumb mb-4" loading="lazy" />'; };
+    const ytThumb = function(ytId){ return 'https://i.ytimg.com/vi/'+ytId+'/hqdefault.jpg'; };
+    const nowISO = function(){ return new Date().toISOString(); };
 
     // Toast
-    let toastTimer;
-    function showToast(text, variant='default') {
+    var toastTimer;
+    function showToast(text, variant){
+      if(!variant){ variant = 'default'; }
       const wrap = document.getElementById('toast');
       const box = document.getElementById('toastBox');
       clearTimeout(toastTimer);
@@ -197,79 +238,68 @@
          variant === 'warn' ? 'bg-yellow-500 text-black' :
          variant === 'err' ? 'bg-red-600 text-white' :
          'bg-gray-900 text-white');
-      wrap.classList.remove('hidden', 'opacity-0');
+      wrap.classList.remove('hidden','opacity-0');
       wrap.classList.add('opacity-100');
-      toastTimer = setTimeout(() => {
+      toastTimer = setTimeout(function () {
         wrap.classList.add('opacity-0');
-        setTimeout(()=>wrap.classList.add('hidden'), 200);
+        setTimeout(function(){ wrap.classList.add('hidden'); }, 180);
       }, 1600);
     }
 
+    // Cookie consent (stores "accepted"/"declined")
+    const CONSENT_KEY = 'cookieConsent';
+    function consentStatus(){ return localStorage.getItem(CONSENT_KEY); }
+    function setConsent(val){ localStorage.setItem(CONSENT_KEY, val); }
+    function hasConsent(){ return consentStatus() === 'accepted'; }
+    if (!consentStatus()) show(cookieBanner);
+    on(cookieAccept, 'click', function(){ setConsent('accepted'); hide(cookieBanner); showToast('YouTube embeds enabled','ok'); });
+    on(cookieDecline, 'click', function(){ setConsent('declined'); hide(cookieBanner); showToast('YouTube embeds disabled','warn'); });
+
     // Favorites storage
-    const loadFavs = () => { try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); } catch { return new Set(); } };
-    const saveFavs = (set) => { try { localStorage.setItem(FAV_KEY, JSON.stringify([...set])); } catch {} };
+    const loadFavs = function(){ try { return new Set(JSON.parse(localStorage.getItem(FAV_KEY) || '[]')); } catch(e){ return new Set(); } };
+    const saveFavs = function(set){ try { localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(set))); } catch(e){} };
     let FAVS = loadFavs();
 
     // Skeletons
     const skeletonKeep = [];
-    function addSkeletons(container, count=3) {
+    function addSkeletons(container, count){
+      if(typeof count!=='number'){ count=3; }
       for (let i=0;i<count;i++){
         const sk = document.createElement('div');
         sk.className = 'skeleton-card bg-white p-4 rounded-2xl shadow animate-pulse';
-        sk.innerHTML = `
-          <div class="rounded-xl bg-gray-200 mb-4 w-full" style="aspect-ratio:16/9;"></div>
-          <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-          <div class="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>
-          <div class="h-8 bg-gray-200 rounded w-32"></div>
-        `;
+        sk.innerHTML = '\
+          <div class="rounded-xl bg-gray-200 mb-4 w-full" style="aspect-ratio:16/9;"></div>\
+          <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>\
+          <div class="h-3 bg-gray-200 rounded w-1/2 mb-4"></div>\
+          <div class="h-8 bg-gray-200 rounded w-32"></div>';
         container.appendChild(sk);
         skeletonKeep.push(sk);
       }
     }
-    function clearSkeletons(){ skeletonKeep.forEach(el => el.remove()); skeletonKeep.length = 0; }
+    function clearSkeletons(){ skeletonKeep.forEach(function(el){ el.remove(); }); skeletonKeep.length = 0; }
 
-    // Items data
-    let items = [];
-    const itemsById = new Map();
-
-    // UI: étoile maj (centralisé)
-    function updateStarUI(id) {
-      const active = FAVS.has(id);
-      document.querySelectorAll(`.tutorial[data-id="${id}"] .fav-btn`).forEach(btn => {
-        btn.textContent = active ? '★' : '☆';
-        btn.classList.toggle('is-fav', active);
-        btn.setAttribute('aria-pressed', String(active));
-        btn.title = active ? 'Remove from favorites' : 'Add to favorites';
-        btn.setAttribute('aria-label', btn.title);
-      });
-      updateFavHeader();
-    }
-
-    function toggleFav(id) {
-      const added = !FAVS.has(id);
-      if (added) FAVS.add(id); else FAVS.delete(id);
-      saveFavs(FAVS);
-      updateStarUI(id);
-      renderFavorites();
-      showToast(added ? 'Added to favorites' : 'Removed from favorites', added ? 'ok' : 'warn');
+    // Build cards
+    function badgeRow(item){
+      const cat = item.category ? '<span class="badge badge-cat">'+item.category+'</span>' : '';
+      const typ = item.type ? '<span class="badge badge-type">'+item.type+'</span>' : '';
+      const lvl = item.level ? '<span class="badge badge-level">'+item.level+'</span>' : '';
+      const isNew = item._isNew ? '<span class="badge badge-new">New</span>' : '';
+      return '<div class="flex flex-wrap gap-2 items-center mb-2">'+cat+typ+lvl+isNew+'</div>';
     }
 
     function attachFavButton(card, item) {
       const btn = document.createElement('button');
-      btn.className = 'fav-btn';
-      btn.type = 'button';
+      btn.className = 'fav-btn'; btn.type = 'button';
       const isFav = FAVS.has(item.id);
       btn.textContent = isFav ? '★' : '☆';
-      if (isFav) btn.classList.add('is-fav');
+      btn.classList.toggle('is-fav', isFav);
       btn.setAttribute('aria-pressed', String(isFav));
       btn.title = isFav ? 'Remove from favorites' : 'Add to favorites';
       btn.setAttribute('aria-label', btn.title);
-      btn.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggleFav(item.id); });
+      btn.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); toggleFav(item.id); });
       card.appendChild(btn);
-      updateStarUI(item.id);
     }
 
-    // Build cards (cartes “card-ui” + vignettes 16/9)
     function createVideoCard(item) {
       const card = document.createElement('div');
       card.className = 'tutorial card-ui bg-white rounded-2xl shadow p-4 flex flex-col';
@@ -279,24 +309,25 @@
       card.dataset.category = item.category || '';
       card.dataset.vgroup = (item.vgroup || 'inspect').toLowerCase();
       card.dataset.section = (item.vgroup === 'fix') ? 'vfix' : (item.vgroup === 'maintenance') ? 'vmaint' : 'vins';
-      card._title = item.title.toLowerCase();
+      card._title = (item.title || '').toLowerCase();
 
-      const titleHTML = `<h2 class="text-lg font-bold text-blue-700 mb-1">${item.title}</h2>`;
-      const descHTML = `<p class="text-sm text-gray-600 mb-3">${item.description || ''}</p>`;
+      const titleHTML = '<h2 class="text-lg font-bold text-blue-700 mb-1">'+(item.title || 'Untitled video')+'</h2>';
+      const descHTML = '<p class="text-sm text-gray-600 mb-3">'+(item.description || '')+'</p>';
+      const badges = badgeRow(item);
 
       if (item.ytId) {
         const thumbUrl = item.thumb || ytThumb(item.ytId);
         const wrapper = document.createElement('div');
         wrapper.className = 'yt-lite mb-4';
-        wrapper.style.backgroundImage = `url('${thumbUrl}')`;
-        wrapper.setAttribute('aria-label', `Play ${item.title}`);
-        wrapper.addEventListener('click', () => {
-          if (!hasConsent) { window.open(`https://www.youtube.com/watch?v=${item.ytId}`, '_blank', 'noopener'); return; }
+        wrapper.style.backgroundImage = "url('"+thumbUrl+"')";
+        wrapper.setAttribute('aria-label', 'Play '+(item.title || 'video'));
+        wrapper.addEventListener('click', function () {
+          if (!hasConsent()) { window.open('https://www.youtube.com/watch?v='+item.ytId, '_blank', 'noopener'); return; }
           const iframe = document.createElement('iframe');
           iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
-          iframe.src = `https://www.youtube-nocookie.com/embed/${item.ytId}?autoplay=1&rel=0`;
+          iframe.src = 'https://www.youtube-nocookie.com/embed/'+item.ytId+'?autoplay=1&rel=0';
           iframe.loading = "lazy";
-          iframe.title = item.title;
+          iframe.title = item.title || 'Video';
           iframe.width = "100%";
           iframe.height = "315";
           iframe.style.border = "0";
@@ -304,32 +335,34 @@
         });
 
         const top = document.createElement('div');
-        top.innerHTML = imgHTML(thumbUrl, item.title);
-        top.firstElementChild.replaceWith(wrapper);
+        top.innerHTML = imgHTML(thumbUrl, item.title || 'video');
+        if(top.firstElementChild){ top.firstElementChild.replaceWith(wrapper); }
 
-        const btnHTML = `
-          <a href="https://www.youtube.com/watch?v=${item.ytId}" target="_blank" rel="noopener"
-             class="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded text-sm w-fit hover:bg-red-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300">▶️ Watch on YouTube</a>`;
+        const btnHTML =
+          '<a href="https://www.youtube.com/watch?v='+item.ytId+'" target="_blank" rel="noopener" ' +
+          'class="inline-flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded text-sm w-fit hover:bg-red-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-300">▶️ Watch on YouTube</a>';
 
         const inner = document.createElement('div');
-        inner.innerHTML = `${titleHTML}${descHTML}`;
-        card.appendChild(top);
-        card.appendChild(inner);
-        card.insertAdjacentHTML('beforeend', btnHTML);
+        inner.innerHTML = badges+titleHTML+descHTML;
+        card.appendChild(top); card.appendChild(inner); card.insertAdjacentHTML('beforeend', btnHTML);
       } else {
         const thumbUrl = item.thumb || fallbackThumb;
         const videoUrl = item.videoUrl || '#';
-        const btnHTML = `
-          <a href="${videoUrl}" target="_blank" rel="noopener"
-             class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded text-sm w-fit hover:bg-blue-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">🎥 Watch Video</a>`;
-        card.innerHTML = `
-          ${imgHTML(thumbUrl, item.title)}
-          ${titleHTML}
-          ${descHTML}
-          ${btnHTML}
-        `;
-      }
+        const btnHTML =
+          '<a href="'+videoUrl+'" target="_blank" rel="noopener" ' +
+          'class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded text-sm w-fit hover:bg-blue-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">🎥 Watch Video</a>';
+        card.innerHTML =
+          imgHTML(thumbUrl, item.title || 'video') +
+          badges + titleHTML + descHTML + btnHTML;
 
+        // fallback si la ressource locale n'existe pas
+        const link = card.querySelector('a[href]');
+        if(link){
+          link.addEventListener('click', function(e){
+            if (videoUrl === '#') { e.preventDefault(); showToast('Video file missing','err'); }
+          });
+        }
+      }
       attachFavButton(card, item);
       return card;
     }
@@ -342,15 +375,20 @@
       card.dataset.type = 'audio';
       card.dataset.category = item.category || '';
       card.dataset.section = 'audio';
-      card._title = item.title.toLowerCase();
-      card.innerHTML = `
-        ${imgHTML(item.thumb, item.title)}
-        <div class="flex-1">
-          <h2 class="text-lg font-bold text-blue-700 mb-1">${item.title}</h2>
-          <p class="text-sm text-gray-600 mb-3">${item.description || ''}</p>
-          <audio controls class="w-full"><source src="${item.audioUrl}" type="audio/mpeg" /></audio>
-        </div>
-      `;
+      card._title = (item.title || '').toLowerCase();
+
+      card.innerHTML =
+        imgHTML(item.thumb, item.title || 'audio') +
+        badgeRow(item) +
+        '<div class="flex-1">' +
+          '<h2 class="text-lg font-bold text-blue-700 mb-1">'+(item.title || 'Untitled audio')+'</h2>' +
+          '<p class="text-sm text-gray-600 mb-3">'+(item.description || '')+'</p>' +
+          '<audio controls class="w-full"><source src="'+(item.audioUrl || '')+'" type="audio/mpeg" /></audio>' +
+          '<p class="text-xs text-gray-400 mt-2">'+(item.duration ? ('Duration: ' + item.duration) : '')+'</p>' +
+        '</div>';
+
+      const audio = card.querySelector('audio');
+      if(audio){ audio.addEventListener('error', function(){ showToast('Audio file not found','err'); }); }
       attachFavButton(card, item);
       return card;
     }
@@ -363,48 +401,119 @@
       card.dataset.type = 'pdf';
       card.dataset.category = item.category || '';
       card.dataset.section = 'pdf';
-      card._title = item.title.toLowerCase();
-      card.innerHTML = `
-        ${imgHTML(item.thumb, item.title)}
-        <div class="flex-1">
-          <h2 class="text-lg font-bold text-blue-700 mb-1">${item.title}</h2>
-          <p class="text-sm text-gray-600 mb-3">${item.description || ''}</p>
-          <a href="${item.pdfUrl}" target="_blank"
-             class="inline-flex items-center gap-2 bg-gray-700 text-white px-4 py-2 rounded text-sm w-fit hover:bg-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300">📄 View PDF</a>
-        </div>
-      `;
+      card._title = (item.title || '').toLowerCase();
+      card.innerHTML =
+        imgHTML(item.thumb, item.title || 'pdf') +
+        badgeRow(item) +
+        '<div class="flex-1">' +
+          '<h2 class="text-lg font-bold text-blue-700 mb-1">'+(item.title || 'Untitled PDF')+'</h2>' +
+          '<p class="text-sm text-gray-600 mb-3">'+(item.description || '')+'</p>' +
+          '<a href="'+(item.pdfUrl || '#')+'" target="_blank" ' +
+             'class="inline-flex items-center gap-2 bg-gray-700 text-white px-4 py-2 rounded text-sm w-fit hover:bg-gray-800 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300">📄 View PDF</a>' +
+        '</div>';
+      const link = card.querySelector('a[href]');
+      if(link){
+        link.addEventListener('click', function(e){
+          if (!item.pdfUrl) { e.preventDefault(); showToast('PDF missing','err'); }
+        });
+      }
       attachFavButton(card, item);
       return card;
     }
 
-    function createCardForItem(item) {
-      if (item.type === 'video') return createVideoCard(item);
-      if (item.type === 'audio') return createAudioCard(item);
-      return createPdfCard(item);
+    function toggleFav(id) {
+      const added = !FAVS.has(id);
+      if (added) FAVS.add(id); else FAVS.delete(id);
+      saveFavs(FAVS);
+      updateStarUI(id);
+      renderFavorites();
+      showToast(added ? 'Added to favorites' : 'Removed from favorites', added ? 'ok' : 'warn');
     }
 
-    // Load JSON & build (avec skeletons)
+    function updateStarUI(id) {
+      const active = FAVS.has(id);
+      var selector = '.tutorial[data-id="' + id + '"] .fav-btn';
+      var nodes = document.querySelectorAll(selector);
+      for (var i=0; i<nodes.length; i++){
+        var btn = nodes[i];
+        btn.textContent = active ? '★' : '☆';
+        btn.classList.toggle('is-fav', active);
+        btn.setAttribute('aria-pressed', String(active));
+        btn.title = active ? 'Remove from favorites' : 'Add to favorites';
+        btn.setAttribute('aria-label', btn.title);
+      }
+      updateFavHeader();
+    }
+
+    // Data state
+    let items = [];
+    const itemsById = new Map();
     let allCards = [];
     const sections = { vfix: [], vins: [], vmaint: [], audio: [], pdf: [] };
     const limits = { vfix: STEP, vins: STEP, vmaint: STEP, audio: STEP, pdf: STEP };
 
-    // skeletons avant le fetch
+    // skeletons
     addSkeletons(containers.vfix, 3);
     addSkeletons(containers.vins, 3);
     addSkeletons(containers.vmaint, 3);
     addSkeletons(containers.audio, 3);
     addSkeletons(containers.pdf, 3);
 
+    // URL <-> UI sync
+    const url = new URL(location.href);
+    function paramsToUI() {
+      searchInput.value   = url.searchParams.get('q')       || '';
+      categoryFilter.value= url.searchParams.get('category')|| '';
+      typeFilter.value    = url.searchParams.get('type')    || '';
+      sortSelect.value    = url.searchParams.get('sort')    || 'relevance';
+      onlyFavs.checked    = url.searchParams.get('favs')    === '1';
+    }
+    function uiToParams(push){
+      if(typeof push==='undefined'){ push=true; }
+      const params = new URLSearchParams();
+      if (searchInput.value) params.set('q', searchInput.value);
+      if (categoryFilter.value) params.set('category', categoryFilter.value);
+      if (typeFilter.value) params.set('type', typeFilter.value);
+      if (sortSelect.value && sortSelect.value !== 'relevance') params.set('sort', sortSelect.value);
+      if (onlyFavs.checked) params.set('favs','1');
+      const newUrl = location.pathname + (params.toString() ? '?' + params.toString() : '');
+      if (push) history.replaceState(null,'',newUrl);
+    }
+    paramsToUI();
+
+    // Load JSON
     try {
       statusMsg.textContent = 'Loading tutorials...';
       const res = await fetch(JSON_PATH, { cache: 'no-store' });
       if (!res.ok) throw new Error('Failed to load JSON');
-      items = await res.json();
-      items.forEach(it => itemsById.set(it.id, it));
+      const raw = await res.json();
+
+      // Validate & normalize
+      const seen = new Set();
+      for (let i=0; i<raw.length; i++){
+        const it = raw[i];
+        if (!it || typeof it !== 'object') continue;
+        if (!it.id) { console.warn('Item missing id', it); continue; }
+        if (seen.has(it.id)) { console.warn('Duplicate id skipped:', it.id); continue; }
+        seen.add(it.id);
+
+        const item = Object.assign({}, it);
+        // derive dates / "new" (7 jours)
+        const created = item.createdAt ? new Date(item.createdAt) : null;
+        item._isNew = created ? (Date.now() - created.getTime() < 7*24*3600*1000) : false;
+
+        // sanitize type
+        if (['video','audio','pdf'].indexOf(item.type) === -1) { console.warn('Unknown type, skipped:', item.id); continue; }
+
+        items.push(item);
+        itemsById.set(item.id, item);
+      }
 
       clearSkeletons();
 
-      items.forEach(item => {
+      // Create cards + append to sections
+      for (let j=0; j<items.length; j++){
+        const item = items[j];
         let card;
         if (item.type === 'video') {
           card = createVideoCard(item);
@@ -421,7 +530,13 @@
           containers.pdf.appendChild(card);
         }
         if (card) allCards.push(card);
-      });
+      }
+
+      // Counts
+      const nVideo = sections.vfix.length + sections.vins.length + sections.vmaint.length;
+      counts.videos.textContent = nVideo ? (nVideo + ' video' + (nVideo>1?'s':'')) : '';
+      counts.audio.textContent = sections.audio.length ? (sections.audio.length + ' audio') : '';
+      counts.pdf.textContent   = sections.pdf.length ? (sections.pdf.length + ' PDF') : '';
 
       statusMsg.textContent = '';
     } catch (err) {
@@ -432,92 +547,122 @@
       return;
     }
 
-    // Filters & pagination
+    // Filter / sort logic
     function matchesFilters(card) {
-      const q = (searchInput?.value || '').toLowerCase();
-      const cat = categoryFilter?.value || '';
-      const typ = typeFilter?.value || '';
-      const title = card._title || (card.querySelector('h2')?.textContent || '').toLowerCase();
-      const okSearch = !q || title.includes(q);
+      const q = (searchInput && searchInput.value ? searchInput.value : '').toLowerCase().trim();
+      const cat = categoryFilter && categoryFilter.value ? categoryFilter.value : '';
+      const typ = typeFilter && typeFilter.value ? typeFilter.value : '';
+      const only = !!(onlyFavs && onlyFavs.checked);
+
+      const id = card.dataset.id;
+      const title = (card._title || '').toLowerCase();
+
+      const okSearch = !q || title.indexOf(q) !== -1;
       const okCat = !cat || (card.dataset.category === cat);
       const okType = !typ || (card.dataset.type === typ);
-      return okSearch && okCat && okType;
+      const okFav = !only || FAVS.has(id);
+      return okSearch && okCat && okType && okFav;
+    }
+
+    function sortCards(list){
+      const mode = (sortSelect && sortSelect.value) ? sortSelect.value : 'relevance';
+      const collator = new Intl.Collator(undefined, { sensitivity:'base' });
+      const byAZ = function(a,b){ return collator.compare(a._title, b._title); };
+      const byCat = function(a,b){ return collator.compare(a.dataset.category, b.dataset.category) || byAZ(a,b); };
+      const byNew = function(a,b){
+        const ia = itemsById.get(a.dataset.id), ib = itemsById.get(b.dataset.id);
+        const da = ia && ia.createdAt ? Date.parse(ia.createdAt) : 0;
+        const db = ib && ib.createdAt ? Date.parse(ib.createdAt) : 0;
+        return (db - da) || byAZ(a,b);
+      };
+      if (mode === 'az') return list.sort(byAZ);
+      if (mode === 'cat') return list.sort(byCat);
+      if (mode === 'new') return list.sort(byNew);
+      return list; // relevance = keep initial order
     }
 
     function renderSection(key) {
+      const wrapper = containers[key];
       const cards = sections[key];
+      // Sort before display
+      sortCards(cards);
+
       let shown = 0;
       let totalMatched = 0;
 
-      cards.forEach(card => {
+      // Clear wrapper first to respect sort ordering
+      wrapper.innerHTML = '';
+      for (let i=0;i<cards.length;i++){
+        const card = cards[i];
         const isMatch = matchesFilters(card);
-        if (!isMatch) { card.style.display = 'none'; return; }
+        if (!isMatch) { card.style.display = 'none'; continue; }
         totalMatched++;
-        if (shown < limits[key]) { card.style.display = 'block'; shown++; }
-        else { card.style.display = 'none'; }
-      });
+        if (shown < limits[key]) {
+          card.style.display = 'block';
+          wrapper.appendChild(card);
+          shown++;
+        }
+      }
 
       const btn = moreBtns[key];
-      if (!btn) return;
-      btn.style.display = (totalMatched > shown) ? 'inline-block' : 'none';
-    }
-
-    function renderAll() {
-      renderSection('vfix');
-      renderSection('vins');
-      renderSection('vmaint');
-      renderSection('audio');
-      renderSection('pdf');
-      renderFavorites();
-    }
-
-    function updateFavHeader() {
-      const q = (searchInput?.value || '').toLowerCase();
-      const cat = categoryFilter?.value || '';
-      const typ = typeFilter?.value || '';
-      let matched = 0;
-      FAVS.forEach(id => {
-        const item = itemsById.get(id);
-        if (!item) return;
-        const title = (item.title || '').toLowerCase();
-        const okSearch = !q || title.includes(q);
-        const okCat = !cat || item.category === cat;
-        const okType = !typ || item.type === typ;
-        if (okSearch && okCat && okType) matched++;
-      });
-      favCount.textContent = matched ? `(${matched})` : '';
-      if (favEmpty) favEmpty.style.display = matched ? 'none' : 'block';
+      if (btn) btn.style.display = (totalMatched > shown) ? 'inline-block' : 'none';
+      return { shown: shown, totalMatched: totalMatched };
     }
 
     function renderFavorites() {
       const wrap = containers.favs;
       wrap.innerHTML = '';
-      const q = (searchInput?.value || '').toLowerCase();
-      const cat = categoryFilter?.value || '';
-      const typ = typeFilter?.value || '';
+      const q = (searchInput && searchInput.value ? searchInput.value : '').toLowerCase();
+      const cat = categoryFilter && categoryFilter.value ? categoryFilter.value : '';
+      const typ = typeFilter && typeFilter.value ? typeFilter.value : '';
 
-      let count = 0;
-      FAVS.forEach(id => {
+      let favCards = [];
+      FAVS.forEach(function(id){
         const item = itemsById.get(id);
         if (!item) return;
         const title = (item.title || '').toLowerCase();
-        const okSearch = !q || title.includes(q);
+        const okSearch = !q || title.indexOf(q) !== -1;
         const okCat = !cat || (item.category === cat);
         const okType = !typ || (item.type === typ);
         if (!(okSearch && okCat && okType)) return;
-
-        const card = createCardForItem(item);
+        const card = (item.type === 'video') ? createVideoCard(item) : (item.type === 'audio') ? createAudioCard(item) : createPdfCard(item);
         card.dataset.section = 'favs';
-        wrap.appendChild(card);
-        count++;
+        favCards.push(card);
       });
 
-      favCount.textContent = count ? `(${count})` : '';
+      favCards = sortCards(favCards);
+      for (let i=0;i<favCards.length;i++){ wrap.appendChild(favCards[i]); }
+
+      const count = favCards.length;
+      favCount.textContent = count ? '('+count+')' : '';
       if (favEmpty) favEmpty.style.display = count ? 'none' : 'block';
     }
 
-    // Initial render
+    function updateFavHeader() {
+      renderFavorites();
+    }
+
+    function renderAll() {
+      const a = renderSection('vfix');
+      const b = renderSection('vins');
+      const c = renderSection('vmaint');
+      const d = renderSection('audio');
+      const e = renderSection('pdf');
+      renderFavorites();
+
+      const totalMatched =
+        ((a && a.totalMatched) || 0) +
+        ((b && b.totalMatched) || 0) +
+        ((c && c.totalMatched) || 0) +
+        ((d && d.totalMatched) || 0) +
+        ((e && e.totalMatched) || 0);
+
+      statsLine.textContent = totalMatched ? (totalMatched + ' result' + (totalMatched>1?'s':'') + ' match your filters') : 'No results match your filters';
+    }
+
+    // Initial render + apply URL filters
     renderAll();
+    uiToParams(false);
 
     // Filter hooks
     function resetLimits() {
@@ -526,28 +671,58 @@
     }
     function onFilterChange() {
       resetLimits();
+      uiToParams();
       renderAll();
     }
-    searchInput?.addEventListener('input', onFilterChange);
-    categoryFilter?.addEventListener('change', onFilterChange);
-    typeFilter?.addEventListener('change', onFilterChange);
+    on(searchInput, 'input', onFilterChange);
+    on(categoryFilter, 'change', onFilterChange);
+    on(typeFilter, 'change', onFilterChange);
+    on(sortSelect, 'change', onFilterChange);
+    on(onlyFavs, 'change', onFilterChange);
 
     // Load more handlers
-    moreBtns.vfix?.addEventListener('click', () => { limits.vfix += STEP; renderSection('vfix'); });
-    moreBtns.vins?.addEventListener('click', () => { limits.vins += STEP; renderSection('vins'); });
-    moreBtns.vmaint?.addEventListener('click', () => { limits.vmaint += STEP; renderSection('vmaint'); });
-    moreBtns.audio?.addEventListener('click', () => { limits.audio += STEP; renderSection('audio'); });
-    moreBtns.pdf?.addEventListener('click', () => { limits.pdf += STEP; renderSection('pdf'); });
+    on(moreBtns.vfix, 'click', function(){ limits.vfix += STEP; renderSection('vfix'); });
+    on(moreBtns.vins, 'click', function(){ limits.vins += STEP; renderSection('vins'); });
+    on(moreBtns.vmaint, 'click', function(){ limits.vmaint += STEP; renderSection('vmaint'); });
+    on(moreBtns.audio, 'click', function(){ limits.audio += STEP; renderSection('audio'); });
+    on(moreBtns.pdf, 'click', function(){ limits.pdf += STEP; renderSection('pdf'); });
 
-    // Clear all favorites
-    clearFavsBtn?.addEventListener('click', () => {
+    // Favorites mgmt
+    on(clearFavsBtn, 'click', function(){
       if (!FAVS.size) return;
       const prev = new Set(FAVS);
       FAVS.clear();
       saveFavs(FAVS);
-      prev.forEach(id => updateStarUI(id));
+      prev.forEach(function(id){ updateStarUI(id); });
       renderFavorites();
       showToast('Favorites cleared', 'warn');
+    });
+
+    // Utility actions
+    on(clearFilters, 'click', function(){
+      if(searchInput) searchInput.value='';
+      if(categoryFilter) categoryFilter.value='';
+      if(typeFilter) typeFilter.value='';
+      if(sortSelect) sortSelect.value='relevance';
+      if(onlyFavs) onlyFavs.checked=false;
+      onFilterChange();
+    });
+
+    on(copyLink, 'click', async function(){
+      uiToParams();
+      try { await navigator.clipboard.writeText(location.href); showToast('Link copied','ok'); }
+      catch(e) { showToast('Cannot copy to clipboard','err'); }
+    });
+
+    // Keyboard shortcuts
+    window.addEventListener('keydown', function(e){
+      if ((e.ctrlKey||e.metaKey) && String(e.key).toLowerCase()==='f') {
+        if (searchInput){ searchInput.focus(); searchInput.select(); }
+      }
+      if ((e.ctrlKey||e.metaKey) && String(e.key).toLowerCase()==='k') {
+        e.preventDefault();
+        if (searchInput){ searchInput.focus(); searchInput.select(); }
+      }
     });
   })();
   </script>
