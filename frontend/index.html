@@ -533,7 +533,7 @@
 
     <!-- Message -->
     <div class="mt-5">
-      <label for="fbMessage" class="block text sm font-semibold text-gray-800 mb-2">
+      <label for="fbMessage" class="block text-sm font-semibold text-gray-800 mb-2">
         Describe your idea for improvement
       </label>
       <textarea id="fbMessage" rows="4"
@@ -592,7 +592,7 @@
   </div>
 </footer>
 
-<!-- ✅ Google Maps: New Places avec fallback Legacy (compat v=weekly) -->
+<!-- ✅ Google Maps: New Places -> Legacy -> OSM Overpass -->
 <script>
   let map;
   let AdvancedMarkerElement, Place, SearchNearbyRankPreference, LatLngBounds;
@@ -608,8 +608,10 @@
     const dφ = rad(b.lat - a.lat), dλ = rad(b.lng - a.lng);
     const φ1 = rad(a.lat), φ2 = rad(b.lat);
     const s = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
-    return 2*Math.atan2(Math.sqrt(s), Math.sqrt(1-s)) * R / 1000;
+    return 2*Math.atan2(Math.sqrt(Math.sqrt?1:1), Math.sqrt(1-s)) * R / 1000; // fixed below
   }
+  // correct km (typo safe)
+  function km(a2,b2){a2=toPlain(a2);b2=toPlain(b2);const R=6371e3,rad=x=>x*Math.PI/180;const dφ=rad(b2.lat-a2.lat),dλ=rad(b2.lng-a2.lng);const φ1=rad(a2.lat),φ2=rad(b2.lat);const s=Math.sin(dφ/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;return 2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s))*R/1000;}
 
   async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
@@ -653,7 +655,6 @@
   async function runNew(center) {
     const c = toPlain(center);
     try {
-      // ⚠️ uniquement des fields supportés par v=weekly
       const request = {
         fields: [
           "displayName",
@@ -694,64 +695,125 @@
       renderCards(sorted, c);
     } catch (e) {
       console.error("[Places New] error:", e);
+      // si 403 / PERMISSION_DENIED → Legacy puis OSM
       return runLegacy(center);
     }
   }
 
   async function runLegacy(center) {
     console.warn("[Places Legacy] fallback");
-    await google.maps.importLibrary("places");
+    try {
+      await google.maps.importLibrary("places");
+      const svc = new google.maps.places.PlacesService(map);
+      const req = { location: center, radius: 10000, type: ["car_repair"], keyword: "garage" };
+      svc.nearbySearch(req, (results, status) => {
+        if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
+          console.warn("[Places Legacy] status:", status, results);
+          return runOSM(center);
+        }
+        const items = results.map(r => {
+          const name = r.name || "Garage";
+          const address = r.vicinity || "Address not available";
+          const ratingText = r.rating ? `⭐ ${r.rating}/5` : "No rating";
+          const position = r.geometry?.location || null;
+          const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
+          const garageKeyword = name.toLowerCase().includes("garage") || name.toLowerCase().includes("atelier");
+          const dist = position ? km(center, position) : Infinity;
+          return { name, address, ratingText, position, link, garageKeyword, dist };
+        }).sort((a,b) => (b.garageKeyword - a.garageKeyword) || (a.dist - b.dist));
 
-    const svc = new google.maps.places.PlacesService(map);
-    const req = { location: center, radius: 10000, type: ["car_repair"], keyword: "garage" };
-    svc.nearbySearch(req, (results, status) => {
-      const list = document.getElementById("garageList");
-      if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
-        list.innerHTML = `<p class="text-gray-600 text-center">No garages found. Check API key/quotas.</p>`;
-        console.error("[Places Legacy] status:", status, results);
-        return;
-      }
-      const items = results.map(r => {
-        const name = r.name || "Garage";
-        const address = r.vicinity || "Address not available";
-        const ratingText = r.rating ? `⭐ ${r.rating}/5` : "No rating";
-        const position = r.geometry?.location || null;
-        const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
-        const garageKeyword = name.toLowerCase().includes("garage") || name.toLowerCase().includes("atelier");
-        const dist = position ? km(center, position) : Infinity;
-        return { name, address, ratingText, position, link, garageKeyword, dist };
-      }).sort((a,b) => (b.garageKeyword - a.garageKeyword) || (a.dist - b.dist));
+        renderCards(items, toPlain(center));
+      });
+    } catch (err) {
+      console.error("[Places Legacy] error:", err);
+      return runOSM(center);
+    }
+  }
 
-      renderCards(items, toPlain(center));
-    });
+  async function runOSM(center) {
+    console.warn("[OSM Overpass] fallback");
+    const list = document.getElementById("garageList");
+    list.innerHTML = `<p class="text-sm text-gray-600">Loading open data…</p>`;
+
+    const q = `
+[out:json][timeout:25];
+(
+  node["shop"="car_repair"](around:10000,${center.lat},${center.lng});
+  way["shop"="car_repair"](around:10000,${center.lat},${center.lng});
+  relation["shop"="car_repair"](around:10000,${center.lat},${center.lng});
+);
+out center tags;
+`;
+    const endpoints = [
+      "https://overpass-api.de/api/interpreter",
+      "https://overpass.kumi.systems/api/interpreter"
+    ];
+    let data = null;
+    for (const ep of endpoints) {
+      try {
+        const res = await fetch(ep + "?data=" + encodeURIComponent(q));
+        if (!res.ok) continue;
+        data = await res.json();
+        break;
+      } catch {}
+    }
+    if (!data?.elements?.length) {
+      list.innerHTML = `<p class="text-gray-600 text-center">No garages found (OSM). Enable Google Places API for richer results.</p>`;
+      return;
+    }
+
+    const items = data.elements.map(el => {
+      const pos = el.type === "node"
+        ? { lat: el.lat, lng: el.lon }
+        : (el.center ? { lat: el.center.lat, lng: el.center.lon } : null);
+      const t = el.tags || {};
+      const name = t.name || "Car repair shop";
+      let address = t["addr:full"] ||
+        [t["addr:housenumber"], t["addr:street"]].filter(Boolean).join(" ") +
+        (t["addr:city"] ? ", " + t["addr:city"] : "") +
+        (t["addr:postcode"] ? " " + t["addr:postcode"] : "");
+      address = address || "Address not available";
+      const ratingText = "OpenStreetMap";
+      const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
+      const garageKeyword = name.toLowerCase().includes("garage") || name.toLowerCase().includes("atelier");
+      const dist = pos ? km(center, pos) : Infinity;
+      return { name, address, ratingText, position: pos, link, garageKeyword, dist };
+    }).sort((a,b) => (b.garageKeyword - a.garageKeyword) || (a.dist - b.dist));
+
+    renderCards(items, toPlain(center));
+    list.insertAdjacentHTML("afterbegin", `<p class="text-xs text-gray-500 mb-2">Results shown via OpenStreetMap fallback (no Google ratings).</p>`);
   }
 
   document.getElementById("findGaragesBtn").addEventListener("click", async () => {
-    if (!map) await initMap();
+    try {
+      if (!map) await initMap();
+      const manual = () => {
+        const input = prompt("Enter your city or postal code:");
+        if (!input) return;
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode({ address: input }, (res, status) => {
+          if (status !== "OK" || !res?.length) return alert("Could not resolve that location.");
+          const loc = res[0].geometry.location;
+          map.setCenter(loc);
+          runNew(loc);
+        });
+      };
 
-    const manual = () => {
-      const input = prompt("Enter your city or postal code:");
-      if (!input) return;
-      const geocoder = new google.maps.Geocoder();
-      geocoder.geocode({ address: input }, (res, status) => {
-        if (status !== "OK" || !res?.length) return alert("Could not resolve that location.");
-        const loc = res[0].geometry.location;
-        map.setCenter(loc);
-        runNew(loc);
-      });
-    };
+      if (!("geolocation" in navigator)) return manual();
 
-    if (!("geolocation" in navigator)) return manual();
-
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const user = { lat: coords.latitude, lng: coords.longitude };
-        map.setCenter(user);
-        runNew(user);
-      },
-      () => manual(),
-      { maximumAge: 60000, timeout: 10000 }
-    );
+      navigator.geolocation.getCurrentPosition(
+        ({ coords }) => {
+          const user = { lat: coords.latitude, lng: coords.longitude };
+          map.setCenter(user);
+          runNew(user);
+        },
+        () => manual(),
+        { maximumAge: 60000, timeout: 10000 }
+      );
+    } catch(e) {
+      console.error(e);
+      alert("Map failed to initialize.");
+    }
   });
 </script>
 
@@ -798,7 +860,7 @@
     document.head.appendChild(script2);
   }
 
-  // 👉 nouveau : bouton "Manage cookies" (réouvre le bandeau)
+  // 👉 "Manage cookies" (réouvre le bandeau)
   document.getElementById("manageCookies")?.addEventListener("click", (e) => {
     e.preventDefault();
     localStorage.removeItem("cookieConsent");
@@ -956,12 +1018,11 @@
 <!-- Ton script principal (diagnostic) -->
 <script src="script.js"></script>
 
-<!-- ===== EmailJS (Option C) : remplace PUBLIC_KEY / YOUR_SERVICE_ID / YOUR_TEMPLATE_ID ===== -->
+<!-- EmailJS -->
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
 (function(){
-  // 1) Initialise EmailJS
-  emailjs.init("eKA64aazIN1Z0h7_d"); // ← ta Public Key (inchangée)
+  emailjs.init("eKA64aazIN1Z0h7_d");
 
   const chips = document.querySelectorAll("#fbUsefulGroup .fb-chip");
   let useful = null;
@@ -976,23 +1037,19 @@
         status = $("fbStatus"), thanks = $("fbThanks"), cnt = $("fbCount"),
         hp = $("fbHP");
 
-  // Compteur caractères
   msg.addEventListener("input", () => {
     if (msg.value.length > 800) msg.value = msg.value.slice(0,800);
     cnt.textContent = msg.value.length;
   });
 
-  // Limite simple anti-spam (15 s)
   let lastSend = 0;
 
-  // Envoi via EmailJS
   submit.addEventListener("click", async () => {
     status.textContent = ""; thanks.classList.add("hidden");
 
     if (Date.now() - lastSend < 15000) { status.textContent = "Please wait a few seconds before sending again."; return; }
     lastSend = Date.now();
 
-    // Honeypot anti-spam
     if (hp && hp.value) { status.textContent = "Bot detected."; return; }
 
     const params = {
@@ -1024,7 +1081,6 @@
     }
   });
 
-  // Copie JSON local (utile si envoi échoue)
   copyBtn.addEventListener("click", async () => {
     const payload = {
       useful: useful || "—",
