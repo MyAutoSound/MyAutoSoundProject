@@ -597,21 +597,20 @@
   let map;
   let AdvancedMarkerElement, Place, SearchNearbyRankPreference, LatLngBounds;
 
-  function toPlain(latlng) {
+  // Helpers
+  const toPlain = (latlng) => {
     if (!latlng) return null;
-    if (typeof latlng.lat === 'function') return { lat: latlng.lat(), lng: latlng.lng() };
+    if (typeof latlng.lat === "function") return { lat: latlng.lat(), lng: latlng.lng() };
     return { lat: Number(latlng.lat), lng: Number(latlng.lng) };
-  }
-  function km(a, b) {
+  };
+  const km = (a, b) => {
     a = toPlain(a); b = toPlain(b);
-    const R = 6371e3, rad = x => x*Math.PI/180;
+    const R = 6371e3, rad = x => x * Math.PI/180;
     const dφ = rad(b.lat - a.lat), dλ = rad(b.lng - a.lng);
     const φ1 = rad(a.lat), φ2 = rad(b.lat);
     const s = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
-    return 2*Math.atan2(Math.sqrt(Math.sqrt?1:1), Math.sqrt(1-s)) * R / 1000; // fixed below
-  }
-  // correct km (typo safe)
-  function km(a2,b2){a2=toPlain(a2);b2=toPlain(b2);const R=6371e3,rad=x=>x*Math.PI/180;const dφ=rad(b2.lat-a2.lat),dλ=rad(b2.lng-a2.lng);const φ1=rad(a2.lat),φ2=rad(b2.lat);const s=Math.sin(dφ/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;return 2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s))*R/1000;}
+    return 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s)) * R / 1000;
+  };
 
   async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
@@ -644,7 +643,7 @@
         <p class="text-sm text-gray-700">${address}</p>
         <p class="text-sm text-gray-700">${ratingText}</p>
         <p class="text-sm text-gray-600">📍 ${d} km away</p>
-        <a href="${link}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
+        <a href="${link}" target="_blank" rel="noopener" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
       `;
       list.appendChild(div);
     });
@@ -652,18 +651,12 @@
     if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 48 });
   }
 
+  // ---------- 1) Places (New)
   async function runNew(center) {
     const c = toPlain(center);
     try {
       const request = {
-        fields: [
-          "displayName",
-          "location",
-          "rating",
-          "userRatingCount",
-          "businessStatus",
-          "formattedAddress"
-        ],
+        fields: ["displayName","location","rating","userRatingCount","businessStatus","formattedAddress"],
         locationRestriction: { center: c, radius: 10000 },
         includedTypes: ["car_repair"],
         maxResultCount: 30,
@@ -671,9 +664,9 @@
         language: "en-CA",
         region: "CA"
       };
-
-      // @ts-ignore (API en évolution)
+      // @ts-ignore
       const { places } = await Place.searchNearby(request);
+
       if (!Array.isArray(places) || places.length === 0) {
         console.warn("[Places New] 0 result → fallback Legacy");
         return runLegacy(center);
@@ -695,15 +688,20 @@
       renderCards(sorted, c);
     } catch (e) {
       console.error("[Places New] error:", e);
-      // si 403 / PERMISSION_DENIED → Legacy puis OSM
+      // 403 (API non activée) → Legacy
       return runLegacy(center);
     }
   }
 
+  // ---------- 2) Legacy PlacesService
   async function runLegacy(center) {
     console.warn("[Places Legacy] fallback");
     try {
       await google.maps.importLibrary("places");
+      if (!google.maps.places?.PlacesService) {
+        console.warn("[Places Legacy] PlacesService non dispo → OSM");
+        return runOSM(center);
+      }
       const svc = new google.maps.places.PlacesService(map);
       const req = { location: center, radius: 10000, type: ["car_repair"], keyword: "garage" };
       svc.nearbySearch(req, (results, status) => {
@@ -730,13 +728,14 @@
     }
   }
 
+  // ---------- 3) OpenStreetMap Overpass (no key)
   async function runOSM(center) {
     console.warn("[OSM Overpass] fallback");
     const list = document.getElementById("garageList");
     list.innerHTML = `<p class="text-sm text-gray-600">Loading open data…</p>`;
 
     const q = `
-[out:json][timeout:25];
+[out:json][timeout=25];
 (
   node["shop"="car_repair"](around:10000,${center.lat},${center.lng});
   way["shop"="car_repair"](around:10000,${center.lat},${center.lng});
@@ -748,15 +747,20 @@ out center tags;
       "https://overpass-api.de/api/interpreter",
       "https://overpass.kumi.systems/api/interpreter"
     ];
+
     let data = null;
     for (const ep of endpoints) {
       try {
-        const res = await fetch(ep + "?data=" + encodeURIComponent(q));
+        const ctl = new AbortController();
+        const t = setTimeout(() => ctl.abort(), 12000);
+        const res = await fetch(ep + "?data=" + encodeURIComponent(q), { signal: ctl.signal });
+        clearTimeout(t);
         if (!res.ok) continue;
         data = await res.json();
         break;
       } catch {}
     }
+
     if (!data?.elements?.length) {
       list.innerHTML = `<p class="text-gray-600 text-center">No garages found (OSM). Enable Google Places API for richer results.</p>`;
       return;
@@ -780,47 +784,58 @@ out center tags;
       return { name, address, ratingText, position: pos, link, garageKeyword, dist };
     }).sort((a,b) => (b.garageKeyword - a.garageKeyword) || (a.dist - b.dist));
 
+    list.innerHTML = `<p class="text-xs text-gray-500 mb-2">Results shown via OpenStreetMap fallback (no Google ratings).</p>`;
     renderCards(items, toPlain(center));
-    list.insertAdjacentHTML("afterbegin", `<p class="text-xs text-gray-500 mb-2">Results shown via OpenStreetMap fallback (no Google ratings).</p>`);
   }
 
+  // Bouton
   document.getElementById("findGaragesBtn").addEventListener("click", async () => {
     try {
       if (!map) await initMap();
-      const manual = () => {
-        const input = prompt("Enter your city or postal code:");
+
+      // Essai geoloc
+      const fallbackManual = async () => {
+        // Fallback ville/code postal via Nominatim (évite d’activer l’API Geocoding Google)
+        const input = prompt("Location access denied. Enter your city or postal code:");
         if (!input) return;
-        const geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ address: input }, (res, status) => {
-          if (status !== "OK" || !res?.length) return alert("Could not resolve that location.");
-          const loc = res[0].geometry.location;
-          map.setCenter(loc);
-          runNew(loc);
-        });
+        try {
+          const q = encodeURIComponent(input.trim());
+          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
+          const [hit] = await res.json();
+          if (!hit) return alert("Could not resolve that location.");
+          const userLoc = { lat: parseFloat(hit.lat), lng: parseFloat(hit.lon) };
+          map.setCenter(userLoc);
+          await runNew(userLoc);
+        } catch {
+          alert("Location lookup failed.");
+        }
       };
 
-      if (!("geolocation" in navigator)) return manual();
+      if (!("geolocation" in navigator)) {
+        return fallbackManual();
+      }
 
       navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
+        async ({ coords }) => {
           const user = { lat: coords.latitude, lng: coords.longitude };
           map.setCenter(user);
-          runNew(user);
+          await runNew(user);
         },
-        () => manual(),
+        () => fallbackManual(),
         { maximumAge: 60000, timeout: 10000 }
       );
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       alert("Map failed to initialize.");
     }
   });
 </script>
 
-<!-- Loader Google Maps (garde v=weekly). Si tu veux plus de champs, passe v=beta -->
+<!-- Loader Google Maps -->
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&v=weekly&loading=async&libraries=maps,marker,places&callback=initMap"
   async defer></script>
+
 
 <!-- 🛡️ Consent Banner -->
 <div id="consent-banner" class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-300 p-4 shadow-lg z-50">
