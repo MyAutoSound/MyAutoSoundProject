@@ -495,89 +495,6 @@
   </div>
 </section>
 
-<!-- Feedback / Satisfaction -->
-<section id="feedback" class="max-w-3xl mx-auto px-4 py-12">
-  <div class="bg-white rounded-2xl shadow p-6">
-    <h2 class="text-xl font-bold text-gray-900">Your feedback helps 🙌</h2>
-    <p class="text-gray-600 mt-1 text-sm">
-      Was the site helpful? Tell us what we should improve.
-    </p>
-
-    <!-- Helpful? -->
-    <div class="mt-5">
-      <label class="block text-sm font-semibold text-gray-800 mb-2">Was the site helpful?</label>
-      <div id="fbUsefulGroup" class="flex flex-wrap gap-2">
-        <button type="button" data-useful="yes"
-                class="fb-chip px-3 py-1.5 rounded-md border border-gray-300 text-sm hover:bg-green-50">
-          👍 Yes, helpful
-        </button>
-        <button type="button" data-useful="no"
-                class="fb-chip px-3 py-1.5 rounded-md border border-gray-300 text-sm hover:bg-red-50">
-          👎 Not really
-        </button>
-      </div>
-    </div>
-
-    <!-- Category -->
-    <div class="mt-5">
-      <label for="fbCategory" class="block text-sm font-semibold text-gray-800 mb-2">What should we improve?</label>
-      <select id="fbCategory" class="w-full p-2 rounded-md border border-gray-300 text-sm">
-        <option value="">— Select —</option>
-        <option value="accuracy">Diagnosis accuracy</option>
-        <option value="speed">Analysis speed</option>
-        <option value="ui">Interface / clarity</option>
-        <option value="tutorials">Tutorials / content</option>
-        <option value="other">Other</option>
-      </select>
-    </div>
-
-    <!-- Message -->
-    <div class="mt-5">
-      <label for="fbMessage" class="block text-sm font-semibold text-gray-800 mb-2">
-        Describe your idea for improvement
-      </label>
-      <textarea id="fbMessage" rows="4"
-                class="w-full p-3 rounded-md border border-gray-300 text-sm"
-                placeholder="e.g., Mobile form is too long; the 'clunk' sound wasn’t recognized; please add more brake tutorials…"></textarea>
-      <div class="mt-1 text-xs text-gray-500"><span id="fbCount">0</span>/800 characters</div>
-      <!-- Honeypot anti-spam -->
-      <input type="text" id="fbHP" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;opacity:0" />
-    </div>
-
-    <!-- Optional contact -->
-    <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
-      <div>
-        <label for="fbEmail" class="block text-sm font-semibold text-gray-800 mb-1">Email (optional)</label>
-        <input id="fbEmail" type="email" inputmode="email" autocomplete="email"
-               class="w-full p-2 rounded-md border border-gray-300 text-sm"
-               placeholder="If you’d like a reply…">
-      </div>
-      <label class="inline-flex items-start gap-2 text-sm text-gray-700 mt-6 md:mt-0">
-        <input id="fbConsent" type="checkbox" class="mt-0.5">
-        <span>You may contact me about this feedback.</span>
-      </label>
-    </div>
-
-    <!-- Actions -->
-    <div class="mt-6 flex flex-wrap gap-3">
-      <button id="fbSubmit"
-              class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
-        Send feedback
-      </button>
-      <button id="fbCopy"
-              class="px-4 py-2 rounded-lg bg-gray-100 text-gray-800 text-sm border hover:bg-gray-200">
-        Copy feedback (JSON)
-      </button>
-      <span id="fbStatus" class="text-sm text-gray-500"></span>
-    </div>
-
-    <!-- Thanks -->
-    <div id="fbThanks" class="hidden mt-6 p-3 rounded-md bg-green-50 border border-green-200 text-green-800 text-sm">
-      Thanks for your feedback! 💙
-    </div>
-  </div>
-</section>
-
 <!-- Footer -->
 <footer class="bg-gray-100 text-gray-600 text-sm py-6 mt-20 border-t">
   <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
@@ -592,10 +509,16 @@
   </div>
 </footer>
 
-<!-- ✅ Google Maps: New Places -> Legacy -> OSM Overpass -->
+<!-- ✅ Google Maps: Places (New) ➜ OSM fallback (pas de Legacy) -->
 <script>
   let map;
   let AdvancedMarkerElement, Place, SearchNearbyRankPreference, LatLngBounds;
+
+  // Évite les "Uncaught (in promise)" bruyants
+  window.addEventListener("unhandledrejection", (e) => {
+    console.warn("[suppressed unhandledrejection]", e.reason);
+    e.preventDefault?.();
+  });
 
   // Helpers
   const toPlain = (latlng) => {
@@ -651,7 +574,7 @@
     if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 48 });
   }
 
-  // ---------- 1) Places (New)
+  // ---------- 1) Places (New). Si 403 ➜ OSM
   async function runNew(center) {
     const c = toPlain(center);
     try {
@@ -668,8 +591,8 @@
       const { places } = await Place.searchNearby(request);
 
       if (!Array.isArray(places) || places.length === 0) {
-        console.warn("[Places New] 0 result → fallback Legacy");
-        return runLegacy(center);
+        console.warn("[Places New] 0 result → OSM fallback");
+        return runOSM(center);
       }
 
       const sorted = places.map(p => {
@@ -687,48 +610,12 @@
 
       renderCards(sorted, c);
     } catch (e) {
-      console.error("[Places New] error:", e);
-      // 403 (API non activée) → Legacy
-      return runLegacy(center);
-    }
-  }
-
-  // ---------- 2) Legacy PlacesService
-  async function runLegacy(center) {
-    console.warn("[Places Legacy] fallback");
-    try {
-      await google.maps.importLibrary("places");
-      if (!google.maps.places?.PlacesService) {
-        console.warn("[Places Legacy] PlacesService non dispo → OSM");
-        return runOSM(center);
-      }
-      const svc = new google.maps.places.PlacesService(map);
-      const req = { location: center, radius: 10000, type: ["car_repair"], keyword: "garage" };
-      svc.nearbySearch(req, (results, status) => {
-        if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
-          console.warn("[Places Legacy] status:", status, results);
-          return runOSM(center);
-        }
-        const items = results.map(r => {
-          const name = r.name || "Garage";
-          const address = r.vicinity || "Address not available";
-          const ratingText = r.rating ? `⭐ ${r.rating}/5` : "No rating";
-          const position = r.geometry?.location || null;
-          const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
-          const garageKeyword = name.toLowerCase().includes("garage") || name.toLowerCase().includes("atelier");
-          const dist = position ? km(center, position) : Infinity;
-          return { name, address, ratingText, position, link, garageKeyword, dist };
-        }).sort((a,b) => (b.garageKeyword - a.garageKeyword) || (a.dist - b.dist));
-
-        renderCards(items, toPlain(center));
-      });
-    } catch (err) {
-      console.error("[Places Legacy] error:", err);
+      console.warn("[Places New] error, using OSM fallback:", e?.message || e);
       return runOSM(center);
     }
   }
 
-  // ---------- 3) OpenStreetMap Overpass (no key)
+  // ---------- 2) OpenStreetMap Overpass (no key)
   async function runOSM(center) {
     console.warn("[OSM Overpass] fallback");
     const list = document.getElementById("garageList");
@@ -793,9 +680,7 @@ out center tags;
     try {
       if (!map) await initMap();
 
-      // Essai geoloc
       const fallbackManual = async () => {
-        // Fallback ville/code postal via Nominatim (évite d’activer l’API Geocoding Google)
         const input = prompt("Location access denied. Enter your city or postal code:");
         if (!input) return;
         try {
@@ -836,7 +721,6 @@ out center tags;
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&v=weekly&loading=async&libraries=maps,marker,places&callback=initMap"
   async defer></script>
 
-
 <!-- 🛡️ Consent Banner -->
 <div id="consent-banner" class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-300 p-4 shadow-lg z-50">
   <div class="max-w-4xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm text-gray-800">
@@ -875,7 +759,7 @@ out center tags;
     document.head.appendChild(script2);
   }
 
-  // 👉 "Manage cookies" (réouvre le bandeau)
+  // 👉 bouton "Manage cookies" (réouvre le bandeau)
   document.getElementById("manageCookies")?.addEventListener("click", (e) => {
     e.preventDefault();
     localStorage.removeItem("cookieConsent");
@@ -1033,11 +917,11 @@ out center tags;
 <!-- Ton script principal (diagnostic) -->
 <script src="script.js"></script>
 
-<!-- EmailJS -->
+<!-- ===== EmailJS ===== -->
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
 (function(){
-  emailjs.init("eKA64aazIN1Z0h7_d");
+  emailjs.init("eKA64aazIN1Z0h7_d"); // ← ta Public Key
 
   const chips = document.querySelectorAll("#fbUsefulGroup .fb-chip");
   let useful = null;
@@ -1058,13 +942,10 @@ out center tags;
   });
 
   let lastSend = 0;
-
   submit.addEventListener("click", async () => {
     status.textContent = ""; thanks.classList.add("hidden");
-
     if (Date.now() - lastSend < 15000) { status.textContent = "Please wait a few seconds before sending again."; return; }
     lastSend = Date.now();
-
     if (hp && hp.value) { status.textContent = "Bot detected."; return; }
 
     const params = {
