@@ -533,7 +533,7 @@
 
     <!-- Message -->
     <div class="mt-5">
-      <label for="fbMessage" class="block text-sm font-semibold text-gray-800 mb-2">
+      <label for="fbMessage" class="block text sm font-semibold text-gray-800 mb-2">
         Describe your idea for improvement
       </label>
       <textarea id="fbMessage" rows="4"
@@ -592,45 +592,23 @@
   </div>
 </footer>
 
-<!-- 🔑 Bootstrap loader pour Maps JS (requis pour importLibrary + Places New) -->
-<script>
-  (g => {
-    var h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__", m = document, b = window;
-    b = b[c] || (b[c] = {}); var d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
-      u = () => h || (h = new Promise(async (f, n) => {
-        await (a = m.createElement("script"));
-        e.set("libraries", [...r] + "");
-        for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
-        e.set("callback", c + ".maps." + q);
-        a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
-        d[q] = f; a.onerror = () => h = n(Error(p + " could not load."));
-        a.nonce = m.querySelector("script[nonce]")?.nonce || ""; m.head.append(a);
-      }));
-    d[l] ? console.warn(p + " only loads once. Ignoring:", g) :
-      d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
-  })({
-    key: "AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU",  // ta clé existante
-    v: "beta"                                        // nécessaire pour Place.searchNearby (Places API New)
-  });
-</script>
-
-<!-- ✅ Google Maps + Places (New) : Nearby Search + Geocoder fallback -->
+<!-- ✅ Google Maps: New Places avec fallback Legacy (compat v=weekly) -->
 <script>
   let map;
   let AdvancedMarkerElement, Place, SearchNearbyRankPreference, LatLngBounds;
 
-  // Convertit LatLng (class) ou literal -> objet simple {lat, lng}
-  const toPlain = (o) =>
-    (o && typeof o.lat === "function") ? { lat: o.lat(), lng: o.lng() } : { lat: Number(o.lat), lng: Number(o.lng) };
-
-  // Haversine en km
-  function distanceKm(a, b) {
+  function toPlain(latlng) {
+    if (!latlng) return null;
+    if (typeof latlng.lat === 'function') return { lat: latlng.lat(), lng: latlng.lng() };
+    return { lat: Number(latlng.lat), lng: Number(latlng.lng) };
+  }
+  function km(a, b) {
     a = toPlain(a); b = toPlain(b);
-    const R = 6371e3, toRad = (x) => x * Math.PI / 180;
-    const dφ = toRad(b.lat - a.lat), dλ = toRad(b.lng - a.lng);
-    const φ1 = toRad(a.lat), φ2 = toRad(b.lat);
+    const R = 6371e3, rad = x => x*Math.PI/180;
+    const dφ = rad(b.lat - a.lat), dλ = rad(b.lng - a.lng);
+    const φ1 = rad(a.lat), φ2 = rad(b.lat);
     const s = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
-    return (2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s))) * R / 1000;
+    return 2*Math.atan2(Math.sqrt(s), Math.sqrt(1-s)) * R / 1000;
   }
 
   async function initMap() {
@@ -646,121 +624,141 @@
     });
   }
 
-  async function runNearbySearch(centerLatLng) {
-    const center = toPlain(centerLatLng);
-
-    // Field mask requis + paramètres “New Places”
-    const request = {
-      fields: [
-        "displayName",
-        "location",
-        "businessStatus",
-        "rating",
-        "userRatingCount",
-        "shortFormattedAddress",
-        "googleMapsUri"
-      ],
-      locationRestriction: { center, radius: 10000 }, // 10 km
-      includedPrimaryTypes: ["car_repair"],
-      maxResultCount: 30,
-      rankPreference: SearchNearbyRankPreference.DISTANCE,
-      language: "en-CA",
-      region: "CA"
-    };
-
-    // @ts-ignore (types encore en transition)
-    const { places } = await Place.searchNearby(request);
-
+  function renderCards(items, center) {
     const list = document.getElementById("garageList");
     list.innerHTML = "";
-
-    if (!places?.length) {
-      list.innerHTML = `<p class="text-gray-600 text-center">No open garages found near you.</p>`;
-      return;
-    }
-
-    // Tri: mot-clé “garage/atelier” puis distance
-    const enriched = places.map(p => {
-      const nameText = (p.displayName && (p.displayName.text || p.displayName)) || "Garage";
-      const hasGarageKeyword = nameText.toLowerCase().includes("garage") || nameText.toLowerCase().includes("atelier");
-      const dist = p.location ? distanceKm(center, p.location) : Infinity;
-      return { p, nameText, dist, hasGarageKeyword };
-    }).sort((a, b) =>
-      (b.hasGarageKeyword - a.hasGarageKeyword) || (a.dist - b.dist)
-    );
-
-    // Marqueurs + liste
     const bounds = new LatLngBounds();
-    enriched.forEach(({ p, nameText, dist }) => {
-      if (p.location) {
-        new AdvancedMarkerElement({ map, position: p.location, title: nameText });
-        bounds.extend(p.location);
+
+    items.forEach(({ name, address, ratingText, position, link }) => {
+      if (position) {
+        new AdvancedMarkerElement({ map, position, title: name });
+        bounds.extend(position);
       }
-
-      const address = p.shortFormattedAddress || "Address not available";
-      const rating = (p.rating != null)
-        ? `⭐ ${p.rating}/5${p.userRatingCount ? ` (${p.userRatingCount})` : ""}`
-        : "No rating";
-      const km = isFinite(dist) ? dist.toFixed(1) : "—";
-      const mapLink = p.googleMapsUri
-        || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(nameText + " " + address)}`;
-
+      const d = position ? km(center, position).toFixed(1) : "—";
       const div = document.createElement("div");
       div.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
       div.innerHTML = `
-        <h3 class="text-lg font-semibold text-blue-700">${nameText}</h3>
+        <h3 class="text-lg font-semibold text-blue-700">${name}</h3>
         <p class="text-sm text-gray-700">${address}</p>
-        <p class="text-sm text-gray-700">${rating}</p>
-        <p class="text-sm text-gray-600">📍 ${km} km away</p>
-        <a href="${mapLink}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
+        <p class="text-sm text-gray-700">${ratingText}</p>
+        <p class="text-sm text-gray-600">📍 ${d} km away</p>
+        <a href="${link}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
       `;
       list.appendChild(div);
     });
 
-    if (!bounds.isEmpty()) map.fitBounds(bounds);
+    if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 48 });
   }
 
-  // Bouton “Find garages near me”
+  async function runNew(center) {
+    const c = toPlain(center);
+    try {
+      // ⚠️ uniquement des fields supportés par v=weekly
+      const request = {
+        fields: [
+          "displayName",
+          "location",
+          "rating",
+          "userRatingCount",
+          "businessStatus",
+          "formattedAddress"
+        ],
+        locationRestriction: { center: c, radius: 10000 },
+        includedTypes: ["car_repair"],
+        maxResultCount: 30,
+        rankPreference: SearchNearbyRankPreference.DISTANCE,
+        language: "en-CA",
+        region: "CA"
+      };
+
+      // @ts-ignore (API en évolution)
+      const { places } = await Place.searchNearby(request);
+      if (!Array.isArray(places) || places.length === 0) {
+        console.warn("[Places New] 0 result → fallback Legacy");
+        return runLegacy(center);
+      }
+
+      const sorted = places.map(p => {
+        const name = (p.displayName && (p.displayName.text || p.displayName)) || "Garage";
+        const address = p.formattedAddress || "Address not available";
+        const ratingText = (p.rating != null)
+          ? `⭐ ${p.rating}/5${p.userRatingCount ? ` (${p.userRatingCount})` : ""}`
+          : "No rating";
+        const position = p.location || null;
+        const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
+        const garageKeyword = name.toLowerCase().includes("garage") || name.toLowerCase().includes("atelier");
+        const dist = position ? km(c, position) : Infinity;
+        return { name, address, ratingText, position, link, garageKeyword, dist };
+      }).sort((a,b) => (b.garageKeyword - a.garageKeyword) || (a.dist - b.dist));
+
+      renderCards(sorted, c);
+    } catch (e) {
+      console.error("[Places New] error:", e);
+      return runLegacy(center);
+    }
+  }
+
+  async function runLegacy(center) {
+    console.warn("[Places Legacy] fallback");
+    await google.maps.importLibrary("places");
+
+    const svc = new google.maps.places.PlacesService(map);
+    const req = { location: center, radius: 10000, type: ["car_repair"], keyword: "garage" };
+    svc.nearbySearch(req, (results, status) => {
+      const list = document.getElementById("garageList");
+      if (status !== google.maps.places.PlacesServiceStatus.OK || !results?.length) {
+        list.innerHTML = `<p class="text-gray-600 text-center">No garages found. Check API key/quotas.</p>`;
+        console.error("[Places Legacy] status:", status, results);
+        return;
+      }
+      const items = results.map(r => {
+        const name = r.name || "Garage";
+        const address = r.vicinity || "Address not available";
+        const ratingText = r.rating ? `⭐ ${r.rating}/5` : "No rating";
+        const position = r.geometry?.location || null;
+        const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
+        const garageKeyword = name.toLowerCase().includes("garage") || name.toLowerCase().includes("atelier");
+        const dist = position ? km(center, position) : Infinity;
+        return { name, address, ratingText, position, link, garageKeyword, dist };
+      }).sort((a,b) => (b.garageKeyword - a.garageKeyword) || (a.dist - b.dist));
+
+      renderCards(items, toPlain(center));
+    });
+  }
+
   document.getElementById("findGaragesBtn").addEventListener("click", async () => {
     if (!map) await initMap();
 
-    const fail = (msg) => alert(msg || "Unable to retrieve your location.");
-
-    if (!("geolocation" in navigator)) {
-      // Fallback: saisir ville / code postal et géocoder via Google
-      const input = prompt("Geolocation not available. Enter your city or postal code:");
+    const manual = () => {
+      const input = prompt("Enter your city or postal code:");
       if (!input) return;
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ address: input }, (res, status) => {
-        if (status !== "OK" || !res?.length) return fail("Could not resolve that location.");
+        if (status !== "OK" || !res?.length) return alert("Could not resolve that location.");
         const loc = res[0].geometry.location;
         map.setCenter(loc);
-        runNearbySearch(loc);
+        runNew(loc);
       });
-      return;
-    }
+    };
+
+    if (!("geolocation" in navigator)) return manual();
 
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        const userLoc = { lat: coords.latitude, lng: coords.longitude };
-        map.setCenter(userLoc);
-        runNearbySearch(userLoc);
+        const user = { lat: coords.latitude, lng: coords.longitude };
+        map.setCenter(user);
+        runNew(user);
       },
-      () => {
-        const input = prompt("Location access denied. Enter your city or postal code:");
-        if (!input) return;
-        const geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ address: input }, (res, status) => {
-          if (status !== "OK" || !res?.length) return fail("Could not resolve that location.");
-          const loc = res[0].geometry.location;
-          map.setCenter(loc);
-          runNearbySearch(loc);
-        });
-      },
+      () => manual(),
       { maximumAge: 60000, timeout: 10000 }
     );
   });
 </script>
+
+<!-- Loader Google Maps (garde v=weekly). Si tu veux plus de champs, passe v=beta -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&v=weekly&loading=async&libraries=maps,marker,places&callback=initMap"
+  async defer></script>
 
 <!-- 🛡️ Consent Banner -->
 <div id="consent-banner" class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-300 p-4 shadow-lg z-50">
@@ -950,7 +948,6 @@
 
   loadDraft();
 })();
-// fin auto-save
 </script>
 
 <!-- jsPDF (pour export PDF) -->
