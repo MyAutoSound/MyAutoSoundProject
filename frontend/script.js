@@ -33,82 +33,168 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   } catch {}
 
-  // ---- Enregistrement micro
+  // ==== Enregistrement micro (compat large + limites + qualité) ====
   recordButton?.addEventListener("click", async (e) => {
     e.preventDefault();
-    if (!mediaRecorder || mediaRecorder.state === "inactive") {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
 
-        recordedChunks = [];
-        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
-        mediaRecorder.onstop = () => {
-          const blob = new Blob(recordedChunks, { type: "audio/webm" });
-          const url = URL.createObjectURL(blob);
-          recordedAudio.src = url;
-          recordedAudio.classList.remove("hidden");
-          recordedAudio.recordedBlob = blob;
-          recordingStatus.textContent = "Recording stopped.";
-        };
-
-        mediaRecorder.start();
-        recordButton.textContent = "⏹️ Stop Recording";
-        recordingStatus.textContent = "Recording...";
-      } catch (err) {
-        console.error(err);
-        alert("Microphone permission denied or not available.");
-      }
-    } else if (mediaRecorder.state === "recording") {
+    // Stop si actif
+    if (mediaRecorder && mediaRecorder.state === "recording") {
       mediaRecorder.stop();
       recordButton.textContent = "🎤 Start Recording";
+      return;
+    }
+
+    try {
+      // Désactivation des traitements pour préserver le bruit auto
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 1,
+          sampleRate: 48000
+        }
+      });
+
+      // MIME support
+      const pickMime = (...cands) => cands.find(t => MediaRecorder.isTypeSupported?.(t)) || "";
+      const mimeType = pickMime(
+        "audio/webm;codecs=opus",
+        "audio/webm",
+        "audio/ogg;codecs=opus",
+        "audio/mp4"
+      );
+      const mrOpts = { mimeType, audioBitsPerSecond: 128_000 };
+
+      mediaRecorder = new MediaRecorder(stream, mrOpts);
+      recordedChunks = [];
+
+      let objectUrlToRevoke = null;
+      let stopTimer = null;
+      const MAX_MS = 30_000; // 30 s
+      const MAX_BYTES = 8 * 1024 * 1024; // 8 Mo
+
+      mediaRecorder.ondataavailable = (ev) => {
+        if (ev.data && ev.data.size > 0) recordedChunks.push(ev.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        clearTimeout(stopTimer);
+        try { stream.getTracks().forEach(t => t.stop()); } catch {}
+
+        const blob = new Blob(recordedChunks, { type: mimeType || "audio/webm" });
+
+        if (blob.size > MAX_BYTES) {
+          recordingStatus.textContent = "Recording too large (>8MB). Try a shorter sample (≤30s).";
+          recordedAudio.classList.add("hidden");
+          recordedAudio.removeAttribute("src");
+          recordedAudio.recordedBlob = null;
+          return;
+        }
+
+        if (objectUrlToRevoke) {
+          try { URL.revokeObjectURL(objectUrlToRevoke); } catch {}
+          objectUrlToRevoke = null;
+        }
+
+        const url = URL.createObjectURL(blob);
+        objectUrlToRevoke = url;
+
+        recordedAudio.src = url;
+        recordedAudio.classList.remove("hidden");
+        recordedAudio.recordedBlob = blob;
+        recordingStatus.textContent = `Recording stopped. ${(blob.size/1024).toFixed(0)} KB`;
+      };
+
+      mediaRecorder.start(250); // timeslice
+      recordButton.textContent = "⏹️ Stop Recording";
+      recordingStatus.textContent = "Recording… (auto-stops at 30s)";
+
+      stopTimer = setTimeout(() => {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+          mediaRecorder.stop();
+          recordButton.textContent = "🎤 Start Recording";
+        }
+      }, MAX_MS);
+
+    } catch (err) {
+      console.error(err);
+      alert("Microphone permission denied or not available.");
     }
   });
 
-  // ---- Soumission du formulaire
+  // ==== Helpers réseau : timeout + retry ====
+  async function fetchWithTimeout(input, init = {}, timeoutMs = 30000, retries = 1) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      const ctrl = new AbortController();
+      const id = setTimeout(() => ctrl.abort(), timeoutMs);
+      try {
+        const resp = await fetch(input, { ...init, signal: ctrl.signal });
+        clearTimeout(id);
+        return resp;
+      } catch (e) {
+        clearTimeout(id);
+        if (attempt === retries) throw e;
+        await new Promise(r => setTimeout(r, 500 * 2 ** attempt));
+      }
+    }
+  }
+
+  // ==== Soumission (validations + timeout/retry) ====
   diagnosisForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    const payload = (typeof window.buildDiagnosisPayload === "function")
+      ? window.buildDiagnosisPayload()
+      : buildDiagnosisPayloadFallback();
+
+    // exiger description OU audio
+    const fileInput = document.getElementById("audioFile");
+    const hasFile = fileInput?.files?.length > 0;
+    const hasRecorded = !!document.getElementById("recordedAudio")?.recordedBlob;
+    const hasText = (payload.description || "").trim().length >= 4;
+
+    if (!hasFile && !hasRecorded && !hasText) {
+      alert("Please enter a short description or attach a recording before diagnosing.");
+      return;
+    }
+
     toggleLoading(true);
-
     try {
-      const payload = (typeof window.buildDiagnosisPayload === "function")
-        ? window.buildDiagnosisPayload()
-        : buildDiagnosisPayloadFallback();
-
       const fd = new FormData();
-      // Champs “legacy”
+
+      // Champs de base (legacy + report)
       fd.append("description", payload.description || "");
       fd.append("location", payload.location || "");
       fd.append("situation", payload.primarySituation || "");
       fd.append("makeModel", (payload?.vehicle?.makeModel) || "");
       fd.append("notes", payload.notes || "");
-      // Report JSON
       fd.append("report", JSON.stringify(payload));
 
-      // Audio: upload > enregistrement
-      const fileInput = document.getElementById("audioFile");
-      if (fileInput?.files?.length > 0) {
-        fd.append("audio", fileInput.files[0]);
-      } else if (recordedAudio?.recordedBlob) {
-        const file = new File([recordedAudio.recordedBlob], "recording.webm", { type: "audio/webm" });
-        fd.append("audio", file);
+      // Audio (priorité au fichier choisi)
+      if (hasFile) {
+        const f = fileInput.files[0];
+        if (f.size > 10 * 1024 * 1024) throw new Error("Audio file too large (>10MB).");
+        fd.append("audio", f);
+      } else if (hasRecorded) {
+        const blob = document.getElementById("recordedAudio").recordedBlob;
+        fd.append("audio", new File([blob], "recording.webm", { type: blob.type || "audio/webm" }));
       }
 
-      const response = await fetch("https://myautosoundproject.onrender.com/diagnose", {
-        method: "POST",
-        body: fd,
-      });
+      const response = await fetchWithTimeout(
+        "https://myautosoundproject.onrender.com/diagnose",
+        { method: "POST", body: fd },
+        40_000, // timeout
+        1       // retry
+      );
 
       let data;
       try { data = await response.json(); }
       catch { throw new Error("Invalid JSON response from server."); }
       if (!response.ok) { throw new Error(data?.error || `Server error (${response.status})`); }
 
-      toggleLoading(false);
-
-      // Garde pour export PDF
+      // OK
       window.__lastDiagnosis = { response: data, payload };
-
       displayDiagnosis(data);
 
       // Historique
@@ -131,8 +217,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     } catch (err) {
       console.error(err);
-      toggleLoading(false);
       alert(err.message || "An error occurred while diagnosing.");
+    } finally {
+      toggleLoading(false);
     }
   });
 
@@ -372,6 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!loadingEl) return;
     if (on) {
       loadingEl.classList.remove("hidden");
+      loadingEl.setAttribute("aria-busy", "true");
       submitBtn && (submitBtn.disabled = true);
       if (loadingRotating) {
         let i = 0;
@@ -384,6 +472,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     } else {
       loadingEl.classList.add("hidden");
+      loadingEl.removeAttribute("aria-busy");
       submitBtn && (submitBtn.disabled = false);
       clearInterval(rotTimer);
       rotTimer = null;
@@ -398,6 +487,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const now = new Date().toLocaleString();
     resultWrap?.classList.remove("hidden");
+    resultWrap?.setAttribute("tabindex", "-1");
     if (timestampText) timestampText.textContent = now;
 
     content.innerHTML = `
@@ -428,6 +518,9 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       `;
     }
+
+    // Focus pour SR/UX
+    setTimeout(() => { try { resultWrap?.focus(); } catch {} }, 0);
   }
 
   function renderHistory() {

@@ -1,3 +1,4 @@
+// server.js — version Render-ready, EmailJS côté front (pas de /feedback)
 import express from "express";
 import cors from "cors";
 import multer from "multer";
@@ -5,29 +6,41 @@ import * as fs from "fs";
 import * as dotenv from "dotenv";
 import { OpenAI } from "openai";
 import { createReadStream } from "fs";
-import path from "path";
-import sgMail from "@sendgrid/mail";
 
 dotenv.config();
 const app = express();
-const upload = multer({ dest: "uploads/" });
-const port = 3001;
 
-// --- OpenAI
+// 🔁 Render fournit le port via la variable d'env PORT
+const port = process.env.PORT ? Number(process.env.PORT) : 3001;
+
+// Uploads (mêmes dossiers; + garde-fous taille/type audio pour éviter les abus)
+const upload = multer({
+  dest: "uploads/",
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10 Mo
+    files: 1
+  },
+  fileFilter: (_req, file, cb) => {
+    const m = (file.mimetype || "").toLowerCase();
+    if (m.startsWith("audio/")) return cb(null, true);
+    cb(new Error("Unsupported file type (audio only)."));
+  }
+});
+
+// --- OpenAI (inchangé)
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-// --- SendGrid (pour feedback par courriel)
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-} else {
-  console.warn("⚠️ SENDGRID_API_KEY is not set. /feedback will fail to send emails.");
-}
 
 app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 
+// Petit healthcheck (utile en prod)
+app.get("/health", (_req, res) => res.json({ ok: true, ts: new Date().toISOString() }));
+
 // ============== DIAGNOSE ==============
 app.post("/diagnose", upload.single("audio"), async (req, res) => {
+  // On nettoie toujours le fichier temp s'il existe
+  const cleanup = (p) => { if (p) { try { fs.unlinkSync(p); } catch {} } };
+
   try {
     console.log("✅ Requête reçue dans /diagnose");
 
@@ -37,22 +50,31 @@ app.post("/diagnose", upload.single("audio"), async (req, res) => {
 
     let transcriptText = "";
 
-    if (req.file) {
-      const oldPath = req.file.path;
-      const newPath = oldPath + ".webm";
-      fs.renameSync(oldPath, newPath);
+    // 🎙️ Transcription (comme avant, mais avec cleanup fiable)
+    let tempPath = null;
+    try {
+      if (req.file) {
+        const oldPath = req.file.path;
+        const newPath = oldPath + ".webm"; // tu renommais déjà en .webm
+        fs.renameSync(oldPath, newPath);
+        tempPath = newPath;
 
-      const transcription = await openai.audio.transcriptions.create({
-        file: createReadStream(newPath),
-        model: "whisper-1",
-      });
+        const transcription = await openai.audio.transcriptions.create({
+          file: createReadStream(newPath),
+          model: "whisper-1",
+        });
 
-      transcriptText = transcription.text;
-      fs.unlinkSync(newPath); // Nettoyage
+        transcriptText = transcription.text;
+      }
+    } catch (e) {
+      console.error("Transcription error:", e?.message || e);
+    } finally {
+      cleanup(tempPath);
     }
 
     const hasAudio = !!transcriptText;
 
+    // 🧠 Prompt (identique à ton format)
     const basePrompt = `You are an expert auto mechanic AI. Your job is to diagnose car problems based on the information provided.
 
 User description:
@@ -77,11 +99,12 @@ Please reply using this format:
 `;
 
     const chatResponse = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4", // on garde ton modèle
       messages: [
         {
           role: "system",
-          content: "You are a professional car mechanic that provides structured, smart diagnoses from sound and user text.",
+          content:
+            "You are a professional car mechanic that provides structured, smart diagnoses from sound and user text.",
         },
         { role: "user", content: basePrompt },
       ],
@@ -90,13 +113,14 @@ Please reply using this format:
     const fullResponse = chatResponse.choices[0]?.message?.content || "No diagnosis received.";
     console.log("🔍 GPT Response:\n", fullResponse);
 
+    // 🧩 Extraction (identique)
     function extractBlock(num, fullText) {
       const regex = new RegExp(`${num}\\. .*?:\\s*([\\s\\S]*?)\\s*(?=${num + 1}\\.|$)`, "i");
       const match = fullText.match(regex);
       return match ? match[1].trim() : "Not specified";
     }
 
-    // Suggestions YouTube
+    // 🔗 Suggestions (identique)
     const suggestionsMap = [
       {
         keywords: ["cliquetis", "ticking", "clatter"],
@@ -186,87 +210,14 @@ Please reply using this format:
     res.json(responsePayload);
 
   } catch (error) {
-    console.error("❌ Erreur dans /diagnose :", error.message);
+    console.error("❌ Erreur dans /diagnose :", error?.message || error);
     res.status(500).json({ error: "Failed to process diagnosis." });
   }
 });
 
-// ============== FEEDBACK (email via SendGrid) ==============
-app.post("/feedback", async (req, res) => {
-  try {
-    const {
-      useful = null,         // 'yes' | 'no' | null
-      category = null,       // 'accuracy' | 'speed' | 'ui' | 'tutorials' | 'other'
-      message = '',
-      email = null,
-      consent = false,
-      context = {}
-    } = req.body || {};
-
-    const clean = {
-      useful: useful === 'yes' ? 'yes' : (useful === 'no' ? 'no' : null),
-      category: ['accuracy','speed','ui','tutorials','other'].includes(category) ? category : null,
-      message: String(message || '').replace(/<[^>]*>?/g, '').slice(0, 2000),
-      email: email && /\S+@\S+\.\S+/.test(email) ? email : null,
-      consent: !!consent,
-      context: context && typeof context === 'object' ? context : {}
-    };
-
-    if (!process.env.SENDGRID_API_KEY || !process.env.FEEDBACK_TO || !process.env.FEEDBACK_FROM) {
-      return res.status(500).json({ ok:false, error: "Email not configured on server." });
-    }
-
-    const html = `
-      <h2>New Feedback – MyAutoSound</h2>
-      <p><strong>Helpful:</strong> ${clean.useful ?? '—'}</p>
-      <p><strong>Category:</strong> ${clean.category ?? '—'}</p>
-      <p><strong>Message:</strong><br>${clean.message ? clean.message.replace(/\n/g,'<br>') : '—'}</p>
-      <hr>
-      <p><strong>User email:</strong> ${clean.email ?? '—'} ${clean.consent ? '(consent to contact)' : '(no consent)'} </p>
-      <p><strong>Lang:</strong> ${String(clean.context.lang || '—').slice(0, 32)}</p>
-      <p><strong>UA:</strong> ${String(clean.context.ua || '—').slice(0, 160)}</p>
-      ${clean.context.lastDiagnosis ? `
-        <hr>
-        <h3>Last Diagnosis (snippet)</h3>
-        <p><strong>Diagnosis:</strong> ${String(clean.context.lastDiagnosis.diagnosis || '—').slice(0,300)}</p>
-        <p><strong>Severity:</strong> ${String(clean.context.lastDiagnosis.severity || '—').slice(0,60)}</p>
-        <p><strong>Danger:</strong> ${String(clean.context.lastDiagnosis.dangerLevel || '—').slice(0,60)}</p>
-      ` : ''}
-      <p style="font-size:12px;color:#6b7280">Received: ${new Date().toISOString()}</p>
-    `;
-
-    const msg = {
-      to: process.env.FEEDBACK_TO,
-      from: process.env.FEEDBACK_FROM,
-      subject: `MyAutoSound Feedback — ${clean.useful ?? 'no flag'}${clean.category ? ' / ' + clean.category : ''}`,
-      text: `
-New Feedback – MyAutoSound
-
-Helpful: ${clean.useful ?? '—'}
-Category: ${clean.category ?? '—'}
-Message:
-${clean.message || '—'}
-
-User email: ${clean.email ?? '—'} ${clean.consent ? '(consent to contact)' : '(no consent)'}
-Lang: ${clean.context.lang || '—'}
-UA: ${clean.context.ua || '—'}
-
-Last Diagnosis (snippet):
-${clean.context.lastDiagnosis ? JSON.stringify(clean.context.lastDiagnosis, null, 2) : '—'}
-
-Received: ${new Date().toISOString()}
-      `.trim(),
-      html
-    };
-
-    await sgMail.send(msg);
-    res.json({ ok: true });
-  } catch (err) {
-    console.error("Feedback send error:", err?.response?.body || err);
-    res.status(500).json({ ok: false, error: "Failed to send feedback email" });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`✅ Server is running at https://myautosoundproject.onrender.com`);
+// ============== Listen (Render & local) ==============
+app.listen(port, "0.0.0.0", () => {
+  // Sur Render, cette variable est parfois définie, sinon on affiche localhost
+  const url = process.env.RENDER_EXTERNAL_URL || `http://localhost:${port}`;
+  console.log(`✅ Server is running at ${url}`);
 });
