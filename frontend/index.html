@@ -495,6 +495,89 @@
   </div>
 </section>
 
+<!-- Feedback / Satisfaction -->
+<section id="feedback" class="max-w-3xl mx-auto px-4 py-12">
+  <div class="bg-white rounded-2xl shadow p-6">
+    <h2 class="text-xl font-bold text-gray-900">Your feedback helps 🙌</h2>
+    <p class="text-gray-600 mt-1 text-sm">
+      Was the site helpful? Tell us what we should improve.
+    </p>
+
+    <!-- Helpful? -->
+    <div class="mt-5">
+      <label class="block text-sm font-semibold text-gray-800 mb-2">Was the site helpful?</label>
+      <div id="fbUsefulGroup" class="flex flex-wrap gap-2">
+        <button type="button" data-useful="yes"
+                class="fb-chip px-3 py-1.5 rounded-md border border-gray-300 text-sm hover:bg-green-50">
+          👍 Yes, helpful
+        </button>
+        <button type="button" data-useful="no"
+                class="fb-chip px-3 py-1.5 rounded-md border border-gray-300 text-sm hover:bg-red-50">
+          👎 Not really
+        </button>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="mt-5">
+      <label for="fbCategory" class="block text-sm font-semibold text-gray-800 mb-2">What should we improve?</label>
+      <select id="fbCategory" class="w-full p-2 rounded-md border border-gray-300 text-sm">
+        <option value="">— Select —</option>
+        <option value="accuracy">Diagnosis accuracy</option>
+        <option value="speed">Analysis speed</option>
+        <option value="ui">Interface / clarity</option>
+        <option value="tutorials">Tutorials / content</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+
+    <!-- Message -->
+    <div class="mt-5">
+      <label for="fbMessage" class="block text-sm font-semibold text-gray-800 mb-2">
+        Describe your idea for improvement
+      </label>
+      <textarea id="fbMessage" rows="4"
+                class="w-full p-3 rounded-md border border-gray-300 text-sm"
+                placeholder="e.g., Mobile form is too long; the 'clunk' sound wasn’t recognized; please add more brake tutorials…"></textarea>
+      <div class="mt-1 text-xs text-gray-500"><span id="fbCount">0</span>/800 characters</div>
+      <!-- Honeypot anti-spam -->
+      <input type="text" id="fbHP" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;opacity:0" />
+    </div>
+
+    <!-- Optional contact -->
+    <div class="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3 items-start">
+      <div>
+        <label for="fbEmail" class="block text-sm font-semibold text-gray-800 mb-1">Email (optional)</label>
+        <input id="fbEmail" type="email" inputmode="email" autocomplete="email"
+               class="w-full p-2 rounded-md border border-gray-300 text-sm"
+               placeholder="If you’d like a reply…">
+      </div>
+      <label class="inline-flex items-start gap-2 text-sm text-gray-700 mt-6 md:mt-0">
+        <input id="fbConsent" type="checkbox" class="mt-0.5">
+        <span>You may contact me about this feedback.</span>
+      </label>
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-6 flex flex-wrap gap-3">
+      <button id="fbSubmit"
+              class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
+        Send feedback
+      </button>
+      <button id="fbCopy"
+              class="px-4 py-2 rounded-lg bg-gray-100 text-gray-800 text-sm border hover:bg-gray-200">
+        Copy feedback (JSON)
+      </button>
+      <span id="fbStatus" class="text-sm text-gray-500"></span>
+    </div>
+
+    <!-- Thanks -->
+    <div id="fbThanks" class="hidden mt-6 p-3 rounded-md bg-green-50 border border-green-200 text-green-800 text-sm">
+      Thanks for your feedback! 💙
+    </div>
+  </div>
+</section>
+
 <!-- Footer -->
 <footer class="bg-gray-100 text-gray-600 text-sm py-6 mt-20 border-t">
   <div class="max-w-4xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
@@ -509,214 +592,149 @@
   </div>
 </footer>
 
-<!-- ✅ Google Maps: Places (New) ➜ OSM fallback (pas de Legacy) -->
+<!-- ✅ Google Maps v1 (importLibrary) + Nearby search (New) + fallback Legacy -->
 <script>
   let map;
-  let AdvancedMarkerElement, Place, SearchNearbyRankPreference, LatLngBounds;
 
-  // Évite les "Uncaught (in promise)" bruyants
-  window.addEventListener("unhandledrejection", (e) => {
-    console.warn("[suppressed unhandledrejection]", e.reason);
-    e.preventDefault?.();
-  });
-
-  // Helpers
-  const toPlain = (latlng) => {
-    if (!latlng) return null;
-    if (typeof latlng.lat === "function") return { lat: latlng.lat(), lng: latlng.lng() };
-    return { lat: Number(latlng.lat), lng: Number(latlng.lng) };
-  };
-  const km = (a, b) => {
-    a = toPlain(a); b = toPlain(b);
-    const R = 6371e3, rad = x => x * Math.PI/180;
-    const dφ = rad(b.lat - a.lat), dλ = rad(b.lng - a.lng);
-    const φ1 = rad(a.lat), φ2 = rad(b.lat);
+  // Haversine en km
+  function haversineKm(a, b) {
+    const R = 6371e3, toRad = (x) => x * Math.PI/180;
+    const dφ = toRad(b.lat - a.lat), dλ = toRad(b.lng - a.lng);
+    const φ1 = toRad(a.lat), φ2 = toRad(b.lat);
     const s = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
-    return 2 * Math.atan2(Math.sqrt(s), Math.sqrt(1 - s)) * R / 1000;
-  };
+    return (2 * Math.atan2(Math.sqrt(s), Math.sqrt(1-s))) * R / 1000;
+  }
 
   async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
-    ({ AdvancedMarkerElement } = await google.maps.importLibrary("marker"));
-    ({ Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places"));
-    ({ LatLngBounds } = await google.maps.importLibrary("core"));
-
     map = new Map(document.getElementById("map"), {
       center: { lat: 45.5017, lng: -73.5673 },
-      zoom: 13,
-      mapTypeControl: false
+      zoom: 13
     });
   }
 
-  function renderCards(items, center) {
-    const list = document.getElementById("garageList");
-    list.innerHTML = "";
-    const bounds = new LatLngBounds();
-
-    items.forEach(({ name, address, ratingText, position, link }) => {
-      if (position) {
-        new AdvancedMarkerElement({ map, position, title: name });
-        bounds.extend(position);
-      }
-      const d = position ? km(center, position).toFixed(1) : "—";
-      const div = document.createElement("div");
-      div.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
-      div.innerHTML = `
-        <h3 class="text-lg font-semibold text-blue-700">${name}</h3>
-        <p class="text-sm text-gray-700">${address}</p>
-        <p class="text-sm text-gray-700">${ratingText}</p>
-        <p class="text-sm text-gray-600">📍 ${d} km away</p>
-        <a href="${link}" target="_blank" rel="noopener" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
-      `;
-      list.appendChild(div);
-    });
-
-    if (!bounds.isEmpty()) map.fitBounds(bounds, { padding: 48 });
-  }
-
-  // ---------- 1) Places (New). Si 403 ➜ OSM
-  async function runNew(center) {
-    const c = toPlain(center);
+  // ---- Places (New)
+  async function searchPlacesNew(userLoc) {
     try {
-      const request = {
-        fields: ["displayName","location","rating","userRatingCount","businessStatus","formattedAddress"],
-        locationRestriction: { center: c, radius: 10000 },
+      const { Place } = await google.maps.importLibrary("places");
+      const req = {
         includedTypes: ["car_repair"],
-        maxResultCount: 30,
-        rankPreference: SearchNearbyRankPreference.DISTANCE,
-        language: "en-CA",
-        region: "CA"
+        locationRestriction: { circle: { center: userLoc, radius: 10000 } },
+        maxResultCount: 20,                 // ✅ la (New) exige 1..20
+        rankPreference: "DISTANCE"
+        // Pas de "fields" ici pour éviter les Unknown fields
       };
-      // @ts-ignore
-      const { places } = await Place.searchNearby(request);
-
-      if (!Array.isArray(places) || places.length === 0) {
-        console.warn("[Places New] 0 result → OSM fallback");
-        return runOSM(center);
-      }
-
-      const sorted = places.map(p => {
-        const name = (p.displayName && (p.displayName.text || p.displayName)) || "Garage";
-        const address = p.formattedAddress || "Address not available";
-        const ratingText = (p.rating != null)
-          ? `⭐ ${p.rating}/5${p.userRatingCount ? ` (${p.userRatingCount})` : ""}`
-          : "No rating";
-        const position = p.location || null;
-        const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
-        const garageKeyword = name.toLowerCase().includes("garage") || name.toLowerCase().includes("atelier");
-        const dist = position ? km(c, position) : Infinity;
-        return { name, address, ratingText, position, link, garageKeyword, dist };
-      }).sort((a,b) => (b.garageKeyword - a.garageKeyword) || (a.dist - b.dist));
-
-      renderCards(sorted, c);
-    } catch (e) {
-      console.warn("[Places New] error, using OSM fallback:", e?.message || e);
-      return runOSM(center);
+      const { places } = await Place.searchNearby(req);
+      return Array.isArray(places) ? places : [];
+    } catch (err) {
+      console.warn("[Places New] error, will try legacy:", err);
+      return null; // signaler au caller d'essayer la legacy
     }
   }
 
-  // ---------- 2) OpenStreetMap Overpass (no key)
-  async function runOSM(center) {
-    console.warn("[OSM Overpass] fallback");
-    const list = document.getElementById("garageList");
-    list.innerHTML = `<p class="text-sm text-gray-600">Loading open data…</p>`;
+  // ---- Places (Legacy) fallback
+  function searchPlacesLegacy(userLoc) {
+    console.warn("[Places Legacy] fallback");
+    return new Promise((resolve) => {
+      const svc = new google.maps.places.PlacesService(map);
+      svc.nearbySearch(
+        { location: userLoc, radius: 10000, type: ["car_repair"], keyword: "garage" },
+        (results, status) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
+            resolve(results);
+          } else {
+            resolve([]);
+          }
+        }
+      );
+    });
+  }
 
-    const q = `
-[out:json][timeout=25];
-(
-  node["shop"="car_repair"](around:10000,${center.lat},${center.lng});
-  way["shop"="car_repair"](around:10000,${center.lat},${center.lng});
-  relation["shop"="car_repair"](around:10000,${center.lat},${center.lng});
-);
-out center tags;
-`;
-    const endpoints = [
-      "https://overpass-api.de/api/interpreter",
-      "https://overpass.kumi.systems/api/interpreter"
-    ];
+  function renderPlaces(items, userLoc) {
+    const garageList = document.getElementById("garageList");
+    garageList.innerHTML = "";
 
-    let data = null;
-    for (const ep of endpoints) {
-      try {
-        const ctl = new AbortController();
-        const t = setTimeout(() => ctl.abort(), 12000);
-        const res = await fetch(ep + "?data=" + encodeURIComponent(q), { signal: ctl.signal });
-        clearTimeout(t);
-        if (!res.ok) continue;
-        data = await res.json();
-        break;
-      } catch {}
-    }
-
-    if (!data?.elements?.length) {
-      list.innerHTML = `<p class="text-gray-600 text-center">No garages found (OSM). Enable Google Places API for richer results.</p>`;
+    if (!items || !items.length) {
+      garageList.innerHTML = `<p class="text-gray-600 text-center">No garages found near you.</p>`;
       return;
     }
 
-    const items = data.elements.map(el => {
-      const pos = el.type === "node"
-        ? { lat: el.lat, lng: el.lon }
-        : (el.center ? { lat: el.center.lat, lng: el.center.lon } : null);
-      const t = el.tags || {};
-      const name = t.name || "Car repair shop";
-      let address = t["addr:full"] ||
-        [t["addr:housenumber"], t["addr:street"]].filter(Boolean).join(" ") +
-        (t["addr:city"] ? ", " + t["addr:city"] : "") +
-        (t["addr:postcode"] ? " " + t["addr:postcode"] : "");
-      address = address || "Address not available";
-      const ratingText = "OpenStreetMap";
-      const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
-      const garageKeyword = name.toLowerCase().includes("garage") || name.toLowerCase().includes("atelier");
-      const dist = pos ? km(center, pos) : Infinity;
-      return { name, address, ratingText, position: pos, link, garageKeyword, dist };
-    }).sort((a,b) => (b.garageKeyword - a.garageKeyword) || (a.dist - b.dist));
+    const normalized = items.map((it) => {
+      // Normaliser New vs Legacy
+      const loc = it.location
+        ? { lat: it.location.lat, lng: it.location.lng }                          // New
+        : { lat: it.geometry?.location?.lat?.(), lng: it.geometry?.location?.lng?.() }; // Legacy
 
-    list.innerHTML = `<p class="text-xs text-gray-500 mb-2">Results shown via OpenStreetMap fallback (no Google ratings).</p>`;
-    renderCards(items, toPlain(center));
+      return {
+        name: it.displayName?.text || it.name || "Garage",
+        address: it.formattedAddress || it.vicinity || "Address not available",
+        rating: it.rating,
+        ratingCount: it.userRatingCount ?? it.user_ratings_total ?? 0,
+        position: loc
+      };
+    }).filter(g => g.position && typeof g.position.lat === "number" && typeof g.position.lng === "number")
+      .map(g => ({ ...g, distance: haversineKm(userLoc, g.position), hasGarageKeyword: g.name.toLowerCase().includes("garage") || g.name.toLowerCase().includes("atelier") }))
+      .sort((a,b) => (b.hasGarageKeyword - a.hasGarageKeyword) || (a.distance - b.distance));
+
+    normalized.forEach((g) => {
+      new google.maps.Marker({ position: g.position, map, title: g.name });
+      const ratingTxt = g.rating ? `⭐ ${g.rating}/5 (${g.ratingCount})` : "No rating";
+      const km = g.distance.toFixed(1);
+      const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(g.name + " " + g.address)}`;
+      const card = document.createElement("div");
+      card.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
+      card.innerHTML = `
+        <h3 class="text-lg font-semibold text-blue-700">${g.name}</h3>
+        <p class="text-sm text-gray-700">${g.address}</p>
+        <p class="text-sm text-gray-700">${ratingTxt}</p>
+        <p class="text-sm text-gray-600">📍 ${km} km away</p>
+        <a href="${mapLink}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
+      `;
+      garageList.appendChild(card);
+    });
+
+    if (!normalized.length) {
+      garageList.innerHTML = `<p class="text-gray-600 text-center">No garages found near you.</p>`;
+    }
   }
 
-  // Bouton
-  document.getElementById("findGaragesBtn").addEventListener("click", async () => {
-    try {
-      if (!map) await initMap();
-
-      const fallbackManual = async () => {
-        const input = prompt("Location access denied. Enter your city or postal code:");
-        if (!input) return;
-        try {
-          const q = encodeURIComponent(input.trim());
-          const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
-          const [hit] = await res.json();
-          if (!hit) return alert("Could not resolve that location.");
-          const userLoc = { lat: parseFloat(hit.lat), lng: parseFloat(hit.lon) };
-          map.setCenter(userLoc);
-          await runNew(userLoc);
-        } catch {
-          alert("Location lookup failed.");
-        }
-      };
-
-      if (!("geolocation" in navigator)) {
-        return fallbackManual();
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        async ({ coords }) => {
-          const user = { lat: coords.latitude, lng: coords.longitude };
-          map.setCenter(user);
-          await runNew(user);
-        },
-        () => fallbackManual(),
-        { maximumAge: 60000, timeout: 10000 }
-      );
-    } catch (e) {
-      console.error(e);
-      alert("Map failed to initialize.");
+  async function findGarages(userLoc) {
+    // Essaye (New), sinon legacy
+    let places = await searchPlacesNew(userLoc);
+    if (places === null) {
+      places = await searchPlacesLegacy(userLoc);
     }
+    renderPlaces(places, userLoc);
+  }
+
+  document.getElementById("findGaragesBtn")?.addEventListener("click", async () => {
+    const fail = (msg) => alert(msg || "Unable to retrieve your location.");
+    if (!("geolocation" in navigator)) return fail("Geolocation not supported by this browser.");
+
+    navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+      const userLoc = { lat: coords.latitude, lng: coords.longitude };
+      map.setCenter(userLoc);
+      await findGarages(userLoc);
+    }, async () => {
+      // Fallback: demande ville / code postal et géocodage Nominatim (léger)
+      const input = prompt("Location access denied. Enter your city or postal code:");
+      if (!input) return;
+      try {
+        const q = encodeURIComponent(input.trim());
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
+        const [hit] = await res.json();
+        if (!hit) return fail("Could not resolve that location.");
+        const userLoc = { lat: parseFloat(hit.lat), lng: parseFloat(hit.lon) };
+        map.setCenter(userLoc);
+        await findGarages(userLoc);
+      } catch {
+        fail("Location lookup failed.");
+      }
+    });
   });
 </script>
 
-<!-- Loader Google Maps -->
+<!-- 🔑 Google Maps loader moderne -->
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&v=weekly&loading=async&libraries=maps,marker,places&callback=initMap"
   async defer></script>
@@ -735,12 +753,12 @@ out center tags;
   const hasConsent = localStorage.getItem("cookieConsent");
   if (hasConsent === "accepted") { loadAnalytics(); }
   else if (hasConsent === "declined") { document.getElementById("consent-banner").style.display = "none"; }
-  document.getElementById("acceptCookies").addEventListener("click", () => {
+  document.getElementById("acceptCookies")?.addEventListener("click", () => {
     localStorage.setItem("cookieConsent", "accepted");
     document.getElementById("consent-banner").style.display = "none";
     loadAnalytics();
   });
-  document.getElementById("declineCookies").addEventListener("click", () => {
+  document.getElementById("declineCookies")?.addEventListener("click", () => {
     localStorage.setItem("cookieConsent", "declined");
     document.getElementById("consent-banner").style.display = "none";
   });
@@ -921,7 +939,8 @@ out center tags;
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
 (function(){
-  emailjs.init("eKA64aazIN1Z0h7_d"); // ← ta Public Key
+  // 1) Initialise EmailJS
+  emailjs.init("eKA64aazIN1Z0h7_d"); // ← ta Public Key (inchangée)
 
   const chips = document.querySelectorAll("#fbUsefulGroup .fb-chip");
   let useful = null;
@@ -936,16 +955,23 @@ out center tags;
         status = $("fbStatus"), thanks = $("fbThanks"), cnt = $("fbCount"),
         hp = $("fbHP");
 
+  // Compteur caractères
   msg.addEventListener("input", () => {
     if (msg.value.length > 800) msg.value = msg.value.slice(0,800);
     cnt.textContent = msg.value.length;
   });
 
+  // Limite simple anti-spam (15 s)
   let lastSend = 0;
+
+  // Envoi via EmailJS
   submit.addEventListener("click", async () => {
     status.textContent = ""; thanks.classList.add("hidden");
+
     if (Date.now() - lastSend < 15000) { status.textContent = "Please wait a few seconds before sending again."; return; }
     lastSend = Date.now();
+
+    // Honeypot anti-spam
     if (hp && hp.value) { status.textContent = "Bot detected."; return; }
 
     const params = {
@@ -977,6 +1003,7 @@ out center tags;
     }
   });
 
+  // Copie JSON local (utile si envoi échoue)
   copyBtn.addEventListener("click", async () => {
     const payload = {
       useful: useful || "—",
