@@ -592,7 +592,7 @@
   </div>
 </footer>
 
-<!-- ✅ Google Maps v1 (importLibrary) + Nearby search (New) + fallback Legacy -->
+<!-- ✅ Google Maps v1 (importLibrary) + Nearby search (Places New) -->
 <script>
   let map;
 
@@ -613,67 +613,56 @@
     });
   }
 
-  // ---- Places (New)
+  // ---- Recherche via Places (New).  fields = OBLIGATOIRE.
   async function searchPlacesNew(userLoc) {
-    try {
-      const { Place } = await google.maps.importLibrary("places");
-      const req = {
-        includedTypes: ["car_repair"],
-        locationRestriction: { circle: { center: userLoc, radius: 10000 } },
-        maxResultCount: 20,                 // ✅ la (New) exige 1..20
-        rankPreference: "DISTANCE"
-        // Pas de "fields" ici pour éviter les Unknown fields
-      };
-      const { places } = await Place.searchNearby(req);
-      return Array.isArray(places) ? places : [];
-    } catch (err) {
-      console.warn("[Places New] error, will try legacy:", err);
-      return null; // signaler au caller d'essayer la legacy
-    }
-  }
+    const { Place } = await google.maps.importLibrary("places");
 
-  // ---- Places (Legacy) fallback
-  function searchPlacesLegacy(userLoc) {
-    console.warn("[Places Legacy] fallback");
-    return new Promise((resolve) => {
-      const svc = new google.maps.places.PlacesService(map);
-      svc.nearbySearch(
-        { location: userLoc, radius: 10000, type: ["car_repair"], keyword: "garage" },
-        (results, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK && results?.length) {
-            resolve(results);
-          } else {
-            resolve([]);
-          }
-        }
-      );
-    });
+    // 👉 Liste de champs autorisés par Nearby Search (New)
+    const placeFields = [
+      "id",
+      "displayName",
+      "location",
+      "formattedAddress",
+      "rating",
+      "userRatingCount",
+      "businessStatus"
+    ];
+
+    const req = {
+      fields: placeFields,                                         // <— requis et doit être un Array
+      includedTypes: ["car_repair"],
+      locationRestriction: { circle: { center: userLoc, radius: 10000 } },
+      maxResultCount: 20,                                          // ≤ 20
+      rankPreference: "DISTANCE"
+    };
+
+    const { places } = await Place.searchNearby(req);
+    return Array.isArray(places) ? places : [];
   }
 
   function renderPlaces(items, userLoc) {
     const garageList = document.getElementById("garageList");
     garageList.innerHTML = "";
 
-    if (!items || !items.length) {
+    if (!items?.length) {
       garageList.innerHTML = `<p class="text-gray-600 text-center">No garages found near you.</p>`;
       return;
     }
 
-    const normalized = items.map((it) => {
-      // Normaliser New vs Legacy
-      const loc = it.location
-        ? { lat: it.location.lat, lng: it.location.lng }                          // New
-        : { lat: it.geometry?.location?.lat?.(), lng: it.geometry?.location?.lng?.() }; // Legacy
-
-      return {
+    const normalized = items
+      .map((it) => ({
         name: it.displayName?.text || it.name || "Garage",
         address: it.formattedAddress || it.vicinity || "Address not available",
         rating: it.rating,
         ratingCount: it.userRatingCount ?? it.user_ratings_total ?? 0,
-        position: loc
-      };
-    }).filter(g => g.position && typeof g.position.lat === "number" && typeof g.position.lng === "number")
-      .map(g => ({ ...g, distance: haversineKm(userLoc, g.position), hasGarageKeyword: g.name.toLowerCase().includes("garage") || g.name.toLowerCase().includes("atelier") }))
+        position: { lat: it.location.lat, lng: it.location.lng }
+      }))
+      .filter(g => typeof g.position?.lat === "number" && typeof g.position?.lng === "number")
+      .map(g => ({
+        ...g,
+        distance: haversineKm(userLoc, g.position),
+        hasGarageKeyword: g.name.toLowerCase().includes("garage") || g.name.toLowerCase().includes("atelier")
+      }))
       .sort((a,b) => (b.hasGarageKeyword - a.hasGarageKeyword) || (a.distance - b.distance));
 
     normalized.forEach((g) => {
@@ -699,12 +688,18 @@
   }
 
   async function findGarages(userLoc) {
-    // Essaye (New), sinon legacy
-    let places = await searchPlacesNew(userLoc);
-    if (places === null) {
-      places = await searchPlacesLegacy(userLoc);
+    try {
+      const places = await searchPlacesNew(userLoc);
+      renderPlaces(places, userLoc);
+    } catch (err) {
+      console.error("[Places New] request failed:", err);
+      const garageList = document.getElementById("garageList");
+      garageList.innerHTML = `
+        <div class="text-red-700 bg-red-50 border border-red-200 p-3 rounded">
+          Could not load nearby places.<br>
+          Make sure <strong>Places API (New)</strong> is enabled for your API key and billing is active.
+        </div>`;
     }
-    renderPlaces(places, userLoc);
   }
 
   document.getElementById("findGaragesBtn")?.addEventListener("click", async () => {
@@ -716,7 +711,7 @@
       map.setCenter(userLoc);
       await findGarages(userLoc);
     }, async () => {
-      // Fallback: demande ville / code postal et géocodage Nominatim (léger)
+      // Fallback: demande ville / code postal et géocodage Nominatim
       const input = prompt("Location access denied. Enter your city or postal code:");
       if (!input) return;
       try {
@@ -733,6 +728,7 @@
     });
   });
 </script>
+
 
 <!-- 🔑 Google Maps loader moderne -->
 <script
