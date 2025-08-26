@@ -592,18 +592,18 @@
   </div>
 </footer>
 
-<!-- ✅ Google Maps (importLibrary) + Nearby search (NEW) + fallback OSM -->
+<!-- ✅ Google Maps (importLibrary) + Nearby search (NEW) avec meilleurs noms & tri -->
 <script>
   let map, infoBox;
 
   // Haversine en km
-  function haversineKm(a, b) {
-    const R = 6371e3, toRad = (x) => x * Math.PI/180;
+  const haversineKm = (a, b) => {
+    const R = 6371e3, toRad = x => x * Math.PI/180;
     const dφ = toRad(b.lat - a.lat), dλ = toRad(b.lng - a.lng);
     const φ1 = toRad(a.lat), φ2 = toRad(b.lat);
     const s = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
     return (2 * Math.atan2(Math.sqrt(s), Math.sqrt(1-s))) * R / 1000;
-  }
+  };
 
   async function initMap() {
     const { Map } = await google.maps.importLibrary("maps");
@@ -617,100 +617,146 @@
     document.getElementById("findGarages").appendChild(infoBox);
   }
 
-  function showError(msg) {
+  const showError = (msg) => {
     const box = document.getElementById("placesError");
-    if (!box) return;
-    box.textContent = msg;
-    box.classList.remove("hidden");
+    if (box) { box.textContent = msg; box.classList.remove("hidden"); }
+  };
+  const clearError = () => {
+    const box = document.getElementById("placesError");
+    if (box) { box.textContent = ""; box.classList.add("hidden"); }
+  };
+
+  // ---- Utilitaires d'extraction robustes (noms/adresse/coords) ----
+  function getPlaceName(p) {
+    // displayName peut être string OU {text, languageCode}
+    const dn = p?.displayName;
+    if (typeof dn === "string" && dn.trim()) return dn.trim();
+    if (dn && typeof dn.text === "string" && dn.text.trim()) return dn.text.trim();
+    if (typeof p?.name === "string" && p.name.trim()) return p.name.trim();
+    // dernier recours: 1ʳᵉ partie de l’adresse
+    if (typeof p?.formattedAddress === "string") {
+      const first = p.formattedAddress.split(",")[0].trim();
+      if (first) return first;
+    }
+    return "Unnamed place";
   }
-  function clearError() {
-    const box = document.getElementById("placesError");
-    if (!box) return;
-    box.classList.add("hidden");
-    box.textContent = "";
+  function getLatLng(p) {
+    // Place (New) => p.location {lat,lng} ; Legacy => geometry.location (LatLng)
+    if (p?.location && typeof p.location.lat === "number" && typeof p.location.lng === "number") {
+      return { lat: p.location.lat, lng: p.location.lng };
+    }
+    if (p?.geometry?.location) {
+      const L = p.geometry.location;
+      return { lat: typeof L.lat === "function" ? L.lat() : L.lat, lng: typeof L.lng === "function" ? L.lng() : L.lng };
+    }
+    return null;
   }
 
-  // ------ Nearby Search (NEW) ------
+  // ---- Nearby Search (NEW) avec champs compatibles ----
   async function findGaragesNew(userLoc) {
     const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
 
-    // ✅ IMPORTANT : Pas de "circle" ici. On passe { center, radius } directement.
     const centerLL = new google.maps.LatLng(userLoc.lat, userLoc.lng);
-    const request = {
-      fields: ["displayName","location","formattedAddress","rating","userRatingCount","businessStatus"],
+
+    // Champs sûrs pour Nearby (NEW)
+    const fields = [
+      "displayName",
+      "location",
+      "formattedAddress",
+      "rating",
+      "userRatingCount",
+      "businessStatus",
+      "currentOpeningHours", // si non supporté, Google l’ignore
+      "types"                // idem
+    ];
+
+    const req = {
+      fields,
       locationRestriction: { center: centerLL, radius: 10000 }, // 10 km
       includedPrimaryTypes: ["car_repair"],
-      maxResultCount: 20, // ✅ <= 20
+      maxResultCount: 20,
       rankPreference: SearchNearbyRankPreference.DISTANCE
     };
 
-    const { places } = await Place.searchNearby(request);
-    return (places || []).map(p => ({
-      name: p.displayName?.text || "Garage",
-      position: p.location,
-      address: p.formattedAddress || "Address not available",
-      rating: p.rating,
-      ratingsTotal: p.userRatingCount || 0,
-    }));
+    const { places } = await Place.searchNearby(req);
+    return Array.isArray(places) ? places : [];
   }
 
-  // ------ Fallback legacy (PlacesService) si le NEW échoue / désactivé ------
+  // ---- Fallback legacy (si NEW indispo) ----
   async function findGaragesLegacy(userLoc) {
     const service = new google.maps.places.PlacesService(map);
-    const req = {
-      location: userLoc,
-      radius: 10000,
-      type: ["car_repair"],
-      keyword: "garage",
-    };
+    const req = { location: userLoc, radius: 10000, type: ["car_repair"], keyword: "garage" };
     return new Promise((resolve, reject) => {
       service.nearbySearch(req, (results, status) => {
         if (status !== google.maps.places.PlacesServiceStatus.OK || !results) {
           return reject(new Error("Legacy nearbySearch failed"));
         }
-        resolve(results.map(r => ({
-          name: r.name || "Garage",
-          position: r.geometry?.location,
-          address: r.vicinity || r.formatted_address || "Address not available",
-          rating: r.rating,
-          ratingsTotal: r.user_ratings_total || 0,
-        })));
+        resolve(results);
       });
     });
+  }
+
+  // ---- Normalisation + tri pertinent ----
+  function normalizeAndRank(userLoc, rawItems) {
+    const keywords = ["garage","auto","mécanique","mechanic","pneu","brake","frein","muffler","silencieux","atelier"];
+    const kw = (s) => {
+      const t = (s || "").toLowerCase();
+      return keywords.some(k => t.includes(k));
+    };
+
+    const list = rawItems.map(p => {
+      const name = getPlaceName(p);
+      const pos  = getLatLng(p);
+      if (!pos) return null;
+
+      const distance = haversineKm(userLoc, pos);
+      const rating   = typeof p.rating === "number" ? p.rating : null;
+      const count    = typeof p.userRatingCount === "number"
+                        ? p.userRatingCount
+                        : (typeof p.user_ratings_total === "number" ? p.user_ratings_total : 0);
+
+      const openNow  = !!p?.currentOpeningHours?.openNow; // si champ présent
+      const addr     = p.formattedAddress || p.vicinity || "Address not available";
+      const types    = Array.isArray(p.types) ? p.types : [];
+
+      // score “qualité” simple : note * log(1+nb avis)
+      const quality  = (rating ? rating : 0) * Math.log1p(Math.max(0, count));
+      const hasKW    = kw(name) || kw(addr) || types.includes("car_repair");
+
+      return { name, pos, address: addr, rating, count, openNow, distance, hasKW, quality };
+    }).filter(Boolean);
+
+    // Tri : ouverts d’abord, mots-clés, meilleure qualité, puis distance
+    return list.sort((a,b) =>
+      (b.openNow - a.openNow) ||
+      (b.hasKW - a.hasKW)     ||
+      (b.quality - a.quality) ||
+      (a.distance - b.distance)
+    );
   }
 
   function renderGarages(userLoc, items) {
     const garageList = document.getElementById("garageList");
     garageList.innerHTML = "";
 
-    // tri distance puis mot-clé “garage/atelier”
-    const prioritized = items.map(x => {
-      const loc = x.position instanceof google.maps.LatLng
-        ? { lat: x.position.lat(), lng: x.position.lng() }
-        : { lat: x.position.lat, lng: x.position.lng };
-      const distance = haversineKm(userLoc, loc);
-      const hasGarageKeyword = (x.name || "").toLowerCase().includes("garage")
-        || (x.name || "").toLowerCase().includes("atelier");
-      return { ...x, loc, distance, hasGarageKeyword };
-    }).sort((a,b) => (b.hasGarageKeyword - a.hasGarageKeyword) || (a.distance - b.distance));
+    const ranked = normalizeAndRank(userLoc, items);
 
-    // Marqueurs + cartes
-    prioritized.forEach(x => {
-      new google.maps.Marker({ position: x.position, map, title: x.name });
+    ranked.forEach(x => {
+      new google.maps.Marker({ position: x.pos, map, title: x.name });
       const card = document.createElement("div");
       card.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
       const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.name + " " + x.address)}`;
       card.innerHTML = `
         <h3 class="text-lg font-semibold text-blue-700">${x.name}</h3>
         <p class="text-sm text-gray-700">${x.address}</p>
-        <p class="text-sm text-gray-700">${x.rating ? "⭐ " + x.rating + "/5 (" + x.ratingsTotal + ")" : "No rating"}</p>
-        <p class="text-sm text-gray-600">📍 ${x.distance.toFixed(1)} km away</p>
+        <p class="text-sm text-gray-700">${x.rating ? "⭐ " + x.rating + "/5 (" + x.count + ")" : "No rating"}</p>
+        <p class="text-sm text-gray-600">📍 ${x.distance.toFixed(1)} km away ${x.openNow ? "· 🟢 Open now" : ""}</p>
         <a href="${mapLink}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
       `;
       garageList.appendChild(card);
     });
 
-    if (!prioritized.length) {
+    if (!ranked.length) {
       const empty = document.createElement("div");
       empty.className = "text-center text-gray-600";
       empty.textContent = "No garages found.";
@@ -726,11 +772,10 @@
     } catch (e) {
       console.warn("[Places New] error, will try legacy:", e);
       showError("Could not load nearby places. Make sure Places API (New) is enabled for your API key and billing is active.");
-      // Fallback
       try {
-        const items = await findGaragesLegacy(userLoc);
-        renderGarages(userLoc, items);
-        clearError(); // si legacy a fonctionné, on enlève le message
+        const legacy = await findGaragesLegacy(userLoc);
+        renderGarages(userLoc, legacy);
+        clearError();
       } catch (err) {
         console.error("[Places Legacy] fallback failed:", err);
       }
@@ -746,7 +791,6 @@
       map.setCenter(userLoc);
       await runNew(userLoc);
     }, async () => {
-      // Fallback : ville/code postal via Nominatim (léger)
       const input = prompt("Location access denied. Enter your city or postal code:");
       if (!input) return;
       try {
@@ -763,6 +807,7 @@
     });
   });
 </script>
+
 
 <!-- 🔑 Google Maps loader -->
 <script
