@@ -592,112 +592,197 @@
   </div>
 </footer>
 
-<!-- ✅ Google Maps (legacy) + PlacesService.nearbySearch -->
+<!-- ✅ Google Maps – Places (New) uniquement -->
 <script>
-  let map;
+  let map, infoBox;
 
-  // Init simple
-  function initMap() {
-    map = new google.maps.Map(document.getElementById("map"), {
+  // Haversine (km)
+  const haversineKm = (a, b) => {
+    const R = 6371e3, toRad = x => x * Math.PI/180;
+    const dφ = toRad(b.lat - a.lat), dλ = toRad(b.lng - a.lng);
+    const φ1 = toRad(a.lat), φ2 = toRad(b.lat);
+    const s = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
+    return (2 * Math.atan2(Math.sqrt(s), Math.sqrt(1-s))) * R / 1000;
+  };
+
+  // UI erreurs douces
+  const showError = (msg) => {
+    const id = "placesError";
+    let box = document.getElementById(id);
+    if (!box) {
+      box = document.createElement("div");
+      box.id = id;
+      box.className = "mt-6 max-w-3xl mx-auto text-sm text-red-800 bg-red-50 border border-red-200 rounded p-4";
+      document.getElementById("findGarages").appendChild(box);
+    }
+    box.textContent = msg;
+  };
+  const clearError = () => {
+    const box = document.getElementById("placesError");
+    if (box) box.remove();
+  };
+
+  // Extraction robuste
+  const getPlaceName = (p) => {
+    const dn = p?.displayName;
+    if (typeof dn === "string" && dn.trim()) return dn.trim();
+    if (dn && typeof dn.text === "string" && dn.text.trim()) return dn.text.trim();
+    if (typeof p?.name === "string" && p.name.trim()) return p.name.trim();
+    if (typeof p?.formattedAddress === "string") {
+      const first = p.formattedAddress.split(",")[0].trim();
+      if (first) return first;
+    }
+    return "Unnamed place";
+  };
+  const getLatLng = (p) => (p?.location && typeof p.location.lat === "number" && typeof p.location.lng === "number")
+    ? { lat: p.location.lat, lng: p.location.lng }
+    : null;
+
+  async function initMap() {
+    const { Map } = await google.maps.importLibrary("maps");
+    map = new Map(document.getElementById("map"), {
       center: { lat: 45.5017, lng: -73.5673 },
       zoom: 13,
     });
   }
 
-  // Distance Haversine (km) à partir de LatLng (legacy)
-  function calculateDistance(origin, destinationLatLng) {
-    const R = 6371e3;
-    const toRad = (x) => x * Math.PI/180;
-    const dest = {
-      lat: typeof destinationLatLng.lat === "function" ? destinationLatLng.lat() : destinationLatLng.lat,
-      lng: typeof destinationLatLng.lng === "function" ? destinationLatLng.lng() : destinationLatLng.lng,
+  // 🔎 Nearby (Places NEW)
+  async function findGaragesNew(userLoc) {
+    const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
+    const center = new google.maps.LatLng(userLoc.lat, userLoc.lng);
+
+    // Champs autorisés pour Nearby (NEW) – surtout pas currentOpeningHours ici
+    const fields = [
+      "id",
+      "displayName",
+      "location",
+      "formattedAddress",
+      "rating",
+      "userRatingCount",
+      "businessStatus",
+      "types"
+    ];
+
+    const req = {
+      fields,
+      locationRestriction: { center, radius: 10000 }, // 10 km
+      includedPrimaryTypes: ["car_repair"],
+      maxResultCount: 20,
+      rankPreference: SearchNearbyRankPreference.DISTANCE
     };
-    const dPhi = toRad(dest.lat - origin.lat);
-    const dLam = toRad(dest.lng - origin.lng);
-    const phi1 = toRad(origin.lat), phi2 = toRad(dest.lat);
-    const a = Math.sin(dPhi/2)**2 + Math.cos(phi1)*Math.cos(phi2)*Math.sin(dLam/2)**2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return (R * c) / 1000;
+
+    const { places } = await Place.searchNearby(req);
+    return Array.isArray(places) ? places : [];
   }
 
-  // Click “Find garages near me”
-  document.getElementById("findGaragesBtn").addEventListener("click", () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation not supported by this browser.");
-      return;
+  // Classement pertinent
+  function normalizeAndRank(userLoc, rawItems) {
+    const keywords = ["garage","auto","mécanique","mechanic","pneu","brake","frein","muffler","silencieux","atelier"];
+    const hasKW = (s, extra=[]) => {
+      const t = (s || "").toLowerCase();
+      return keywords.some(k => t.includes(k)) || extra.some(k => t.includes(k));
+    };
+
+    const list = rawItems.map(p => {
+      const name = getPlaceName(p);
+      const pos  = getLatLng(p);
+      if (!pos) return null;
+
+      const distance = haversineKm(userLoc, pos);
+      const rating   = typeof p.rating === "number" ? p.rating : null;
+      const count    = typeof p.userRatingCount === "number" ? p.userRatingCount : 0;
+      const status   = p.businessStatus || "UNKNOWN"; // OPERATIONAL / CLOSED_* / UNKNOWN
+      const addr     = p.formattedAddress || "Address not available";
+      const types    = Array.isArray(p.types) ? p.types : [];
+
+      const quality  = (rating ? rating : 0) * Math.log1p(Math.max(0, count));
+      const kwFlag   = hasKW(name, types) || hasKW(addr);
+
+      return { name, pos, address: addr, rating, count, distance, status, kwFlag, quality };
+    }).filter(Boolean);
+
+    // filtrer fermés définitivement
+    const filtered = list.filter(x => x.status !== "CLOSED_PERMANENTLY");
+
+    // tri: opérationnels → mots-clés → qualité → distance
+    return filtered.sort((a,b) =>
+      ((b.status === "OPERATIONAL") - (a.status === "OPERATIONAL")) ||
+      (b.kwFlag - a.kwFlag) ||
+      (b.quality - a.quality) ||
+      (a.distance - b.distance)
+    );
+  }
+
+  function renderGarages(userLoc, items) {
+    const garageList = document.getElementById("garageList");
+    garageList.innerHTML = "";
+    const ranked = normalizeAndRank(userLoc, items);
+
+    ranked.forEach(x => {
+      new google.maps.Marker({ position: x.pos, map, title: x.name });
+      const card = document.createElement("div");
+      card.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
+      const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.name + " " + x.address)}`;
+      const statusTxt = x.status && x.status !== "OPERATIONAL" ? ` · ${x.status.replaceAll("_"," ").toLowerCase()}` : "";
+      card.innerHTML = `
+        <h3 class="text-lg font-semibold text-blue-700">${x.name}</h3>
+        <p class="text-sm text-gray-700">${x.address}</p>
+        <p class="text-sm text-gray-700">${x.rating ? "⭐ " + x.rating + "/5 (" + x.count + ")" : "No rating"}</p>
+        <p class="text-sm text-gray-600">📍 ${x.distance.toFixed(1)} km away${statusTxt}</p>
+        <a href="${mapLink}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
+      `;
+      garageList.appendChild(card);
+    });
+
+    if (!ranked.length) {
+      const empty = document.createElement("div");
+      empty.className = "text-center text-gray-600";
+      empty.textContent = "No garages found.";
+      garageList.appendChild(empty);
     }
+  }
 
-    navigator.geolocation.getCurrentPosition((pos) => {
-      const userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-      map.setCenter(userLocation);
+  async function run(userLoc) {
+    clearError();
+    try {
+      const items = await findGaragesNew(userLoc);
+      renderGarages(userLoc, items);
+    } catch (e) {
+      console.error("[Places New] error:", e);
+      // Erreurs fréquentes : ApiTargetBlockedMapError / PERMISSION_DENIED
+      showError("Places (New) refusé par Google pour cette clé. Vérifie les réglages API de la clé (voir étapes ci-dessous).");
+    }
+  }
 
-      // 🔎 Legacy PlacesService
-      const service = new google.maps.places.PlacesService(map);
-      const request = {
-        location: userLocation,
-        radius: 10000,                 // 10 km
-        type: "car_repair",            // legacy accepte string ici
-        keyword: "garage"
-      };
+  document.getElementById("findGaragesBtn").addEventListener("click", async () => {
+    const fail = (msg) => showError(msg || "Unable to retrieve your location.");
+    if (!("geolocation" in navigator)) return fail("Geolocation not supported by this browser.");
 
-      service.nearbySearch(request, (results, status) => {
-        const garageList = document.getElementById("garageList");
-        garageList.innerHTML = "";
-
-        if (status === google.maps.places.PlacesServiceStatus.OK && Array.isArray(results)) {
-          const prioritized = results
-            .map((place) => {
-              const distance = calculateDistance(userLocation, place.geometry.location);
-              const name = (place.name || "").toLowerCase();
-              const hasGarageKeyword = name.includes("garage") || name.includes("atelier");
-              return { ...place, distance, hasGarageKeyword };
-            })
-            .sort((a, b) =>
-              (b.hasGarageKeyword - a.hasGarageKeyword) || (a.distance - b.distance)
-            );
-
-          prioritized.forEach((place) => {
-            new google.maps.Marker({
-              position: place.geometry.location,
-              map,
-              title: place.name || "Garage"
-            });
-
-            const name = place.name || "Garage";
-            const address = place.vicinity || "Address not available";
-            const rating = place.rating ? `⭐ ${place.rating}/5` : "No rating";
-            const km = place.distance.toFixed(1);
-            const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name + " " + address)}`;
-
-            const card = document.createElement("div");
-            card.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
-            card.innerHTML = `
-              <h3 class="text-lg font-semibold text-blue-700">${name}</h3>
-              <p class="text-sm text-gray-700">${address}</p>
-              <p class="text-sm text-gray-700">${rating}</p>
-              <p class="text-sm text-gray-600">📍 ${km} km away</p>
-              <a href="${mapLink}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
-            `;
-            garageList.appendChild(card);
-          });
-
-          if (!prioritized.length) {
-            garageList.innerHTML = `<p class="text-gray-600 text-center">No open garages found near you.</p>`;
-          }
-        } else {
-          console.error("PlacesService failed:", status);
-          alert("An error occurred while fetching nearby garages.");
-        }
-      });
-    }, () => {
-      alert("Unable to retrieve your location. Please allow location access.");
+    navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+      const userLoc = { lat: coords.latitude, lng: coords.longitude };
+      map.setCenter(userLoc);
+      await run(userLoc);
+    }, async () => {
+      const input = prompt("Location access denied. Enter your city or postal code:");
+      if (!input) return;
+      try {
+        const q = encodeURIComponent(input.trim());
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${q}`);
+        const [hit] = await res.json();
+        if (!hit) return fail("Could not resolve that location.");
+        const userLoc = { lat: parseFloat(hit.lat), lng: parseFloat(hit.lon) };
+        map.setCenter(userLoc);
+        await run(userLoc);
+      } catch {
+        fail("Location lookup failed.");
+      }
     });
   });
 </script>
 
-<!-- 🔑 Loader Google Maps (legacy) -->
+<!-- 🔑 Loader moderne (avec loading=async, maps+places, FR-CA) -->
 <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&libraries=places&language=fr&region=CA&callback=initMap"
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&v=weekly&loading=async&libraries=maps,places&language=fr&region=CA&callback=initMap"
   async defer></script>
 
 
