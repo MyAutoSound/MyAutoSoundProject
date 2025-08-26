@@ -592,11 +592,10 @@
   </div>
 </footer>
 
-<!-- ✅ Google Maps (importLibrary) + Nearby search (NEW) avec meilleurs noms & tri -->
+<!-- ✅ Google Maps (importLibrary) + Nearby search (NEW) – noms & tri améliorés -->
 <script>
   let map, infoBox;
 
-  // Haversine en km
   const haversineKm = (a, b) => {
     const R = 6371e3, toRad = x => x * Math.PI/180;
     const dφ = toRad(b.lat - a.lat), dλ = toRad(b.lng - a.lng);
@@ -626,14 +625,12 @@
     if (box) { box.textContent = ""; box.classList.add("hidden"); }
   };
 
-  // ---- Utilitaires d'extraction robustes (noms/adresse/coords) ----
+  // -- Helpers extraction robustes --
   function getPlaceName(p) {
-    // displayName peut être string OU {text, languageCode}
     const dn = p?.displayName;
     if (typeof dn === "string" && dn.trim()) return dn.trim();
     if (dn && typeof dn.text === "string" && dn.text.trim()) return dn.text.trim();
     if (typeof p?.name === "string" && p.name.trim()) return p.name.trim();
-    // dernier recours: 1ʳᵉ partie de l’adresse
     if (typeof p?.formattedAddress === "string") {
       const first = p.formattedAddress.split(",")[0].trim();
       if (first) return first;
@@ -641,7 +638,6 @@
     return "Unnamed place";
   }
   function getLatLng(p) {
-    // Place (New) => p.location {lat,lng} ; Legacy => geometry.location (LatLng)
     if (p?.location && typeof p.location.lat === "number" && typeof p.location.lng === "number") {
       return { lat: p.location.lat, lng: p.location.lng };
     }
@@ -652,29 +648,29 @@
     return null;
   }
 
-  // ---- Nearby Search (NEW) avec champs compatibles ----
+  // ---- Nearby Search (NEW) ----
   async function findGaragesNew(userLoc) {
     const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
 
     const centerLL = new google.maps.LatLng(userLoc.lat, userLoc.lng);
 
-    // Champs sûrs pour Nearby (NEW)
+    // ✅ Liste de champs compatibles pour Nearby (NEW)
     const fields = [
+      "id",
       "displayName",
       "location",
       "formattedAddress",
       "rating",
       "userRatingCount",
       "businessStatus",
-      "currentOpeningHours", // si non supporté, Google l’ignore
-      "types"                // idem
+      "types"
     ];
 
     const req = {
       fields,
       locationRestriction: { center: centerLL, radius: 10000 }, // 10 km
       includedPrimaryTypes: ["car_repair"],
-      maxResultCount: 20,
+      maxResultCount: 20,                                       // ≤ 20
       rankPreference: SearchNearbyRankPreference.DISTANCE
     };
 
@@ -696,12 +692,12 @@
     });
   }
 
-  // ---- Normalisation + tri pertinent ----
+  // ---- Normalisation + tri (statut → mots-clés → qualité → distance) ----
   function normalizeAndRank(userLoc, rawItems) {
     const keywords = ["garage","auto","mécanique","mechanic","pneu","brake","frein","muffler","silencieux","atelier"];
-    const kw = (s) => {
+    const hasKW = (s, extra=[]) => {
       const t = (s || "").toLowerCase();
-      return keywords.some(k => t.includes(k));
+      return keywords.some(k => t.includes(k)) || extra.some(k => t.includes(k));
     };
 
     const list = rawItems.map(p => {
@@ -714,22 +710,23 @@
       const count    = typeof p.userRatingCount === "number"
                         ? p.userRatingCount
                         : (typeof p.user_ratings_total === "number" ? p.user_ratings_total : 0);
-
-      const openNow  = !!p?.currentOpeningHours?.openNow; // si champ présent
+      const status   = p.businessStatus || "UNKNOWN"; // OPERATIONAL / CLOSED_TEMPORARILY / CLOSED_PERMANENTLY / UNKNOWN
       const addr     = p.formattedAddress || p.vicinity || "Address not available";
       const types    = Array.isArray(p.types) ? p.types : [];
 
-      // score “qualité” simple : note * log(1+nb avis)
       const quality  = (rating ? rating : 0) * Math.log1p(Math.max(0, count));
-      const hasKW    = kw(name) || kw(addr) || types.includes("car_repair");
+      const kwFlag   = hasKW(name, types) || hasKW(addr);
 
-      return { name, pos, address: addr, rating, count, openNow, distance, hasKW, quality };
+      return { name, pos, address: addr, rating, count, distance, status, kwFlag, quality };
     }).filter(Boolean);
 
-    // Tri : ouverts d’abord, mots-clés, meilleure qualité, puis distance
-    return list.sort((a,b) =>
-      (b.openNow - a.openNow) ||
-      (b.hasKW - a.hasKW)     ||
+    // Filtrer les définitivement fermés
+    const filtered = list.filter(x => x.status !== "CLOSED_PERMANENTLY");
+
+    // Tri : OPERATIONAL d’abord, puis mots-clés, qualité, distance
+    return filtered.sort((a,b) =>
+      ((b.status === "OPERATIONAL") - (a.status === "OPERATIONAL")) ||
+      (b.kwFlag - a.kwFlag) ||
       (b.quality - a.quality) ||
       (a.distance - b.distance)
     );
@@ -746,11 +743,12 @@
       const card = document.createElement("div");
       card.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
       const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.name + " " + x.address)}`;
+      const statusTxt = x.status && x.status !== "OPERATIONAL" ? ` · ${x.status.replaceAll("_"," ").toLowerCase()}` : "";
       card.innerHTML = `
         <h3 class="text-lg font-semibold text-blue-700">${x.name}</h3>
         <p class="text-sm text-gray-700">${x.address}</p>
         <p class="text-sm text-gray-700">${x.rating ? "⭐ " + x.rating + "/5 (" + x.count + ")" : "No rating"}</p>
-        <p class="text-sm text-gray-600">📍 ${x.distance.toFixed(1)} km away ${x.openNow ? "· 🟢 Open now" : ""}</p>
+        <p class="text-sm text-gray-600">📍 ${x.distance.toFixed(1)} km away${statusTxt}</p>
         <a href="${mapLink}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
       `;
       garageList.appendChild(card);
@@ -808,12 +806,10 @@
   });
 </script>
 
-
-<!-- 🔑 Google Maps loader -->
+<!-- 🔑 Loader Maps (tu peux garder celui que tu as) — bonus: langue/région -->
 <script
-  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&v=weekly&loading=async&libraries=maps,places&callback=initMap"
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&v=weekly&loading=async&libraries=maps,places&language=fr&region=CA&callback=initMap"
   async defer></script>
-
 
 <!-- 🛡️ Consent Banner -->
 <div id="consent-banner" class="fixed bottom-0 inset-x-0 bg-white border-t border-gray-300 p-4 shadow-lg z-50">
