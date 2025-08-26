@@ -592,77 +592,91 @@
   </div>
 </footer>
 
-<!-- ✅ Google Maps – Places (New) avec fallbacks (Text Search puis OSM) -->
+<!-- ✅ Google Maps – Places (New) avec fallbacks et messages visibles -->
 <script>
   let map;
 
-  // --- utilitaires ---
-  const toLatLng = (o) => new google.maps.LatLng(o.lat, o.lng);
-  const haversineKm = (a, b) => {
-    const R = 6371e3, rad = (x) => x * Math.PI/180;
-    const dφ = rad(b.lat - a.lat), dλ = rad(b.lng - a.lng);
+  // ---------- utils ----------
+  const $list = () => document.getElementById("garageList");
+  const clearList = () => ($list().innerHTML = "");
+  const appendMsg = (t) => {
+    const p = document.createElement("p");
+    p.className = "text-center text-gray-500 my-2";
+    p.textContent = t;
+    $list().appendChild(p);
+  };
+  const toLL = (o) => new google.maps.LatLng(o.lat, o.lng);
+  const km = (a,b) => {
+    const R = 6371e3, rad = x => x*Math.PI/180;
+    const dφ = rad(b.lat-a.lat), dλ = rad(b.lng-a.lng);
     const φ1 = rad(a.lat), φ2 = rad(b.lat);
     const s = Math.sin(dφ/2)**2 + Math.cos(φ1)*Math.cos(φ2)*Math.sin(dλ/2)**2;
-    return (2 * Math.atan2(Math.sqrt(s), Math.sqrt(1-s))) * R / 1000;
+    return (2*Math.atan2(Math.sqrt(s), Math.sqrt(1-s)))*R/1000;
   };
-  const showMsg = (text) => {
-    const list = document.getElementById("garageList");
-    const p = document.createElement("p");
-    p.className = "text-center text-gray-500 my-4";
-    p.textContent = text;
-    list.appendChild(p);
-  };
-  const clearList = () => { const l = document.getElementById("garageList"); l.innerHTML = ""; };
+  const placeName = (p) =>
+    (typeof p?.displayName === "string" && p.displayName.trim()) ? p.displayName.trim()
+    : (p?.displayName?.text || p?.name || (p?.formattedAddress || "").split(",")[0] || "Unnamed place");
 
-  // Nom et lat/lng sûrs (API New)
-  const getPlaceName = (p) => {
-    if (typeof p?.displayName === "string" && p.displayName.trim()) return p.displayName.trim();
-    if (p?.displayName?.text) return String(p.displayName.text).trim();
-    if (p?.name) return String(p.name).trim();
-    if (p?.formattedAddress) return p.formattedAddress.split(",")[0].trim();
-    return "Unnamed place";
-  };
-  const getLatLng = (p) =>
-    (p?.location && typeof p.location.lat === "number" && typeof p.location.lng === "number")
-      ? { lat: p.location.lat, lng: p.location.lng } : null;
+  const placePos = (p) =>
+    (p?.location && typeof p.location.lat==="number" && typeof p.location.lng==="number")
+      ? {lat:p.location.lat,lng:p.location.lng} : null;
 
-  // Tri pertinent : ouvert > mots-clés > qualité avis > distance
-  function normalizeAndRank(userLoc, raw) {
-    const kw = ["garage","auto","mécanique","mechanic","pneu","brake","frein","muffler","atelier","carrepair","car repair","auto repair"];
-    const hasKW = (s) => kw.some(k => (s || "").toLowerCase().includes(k));
-    const list = (raw || []).map(p => {
-      const name = getPlaceName(p);
-      const pos  = getLatLng(p);
-      if (!pos) return null;
-      const address = p.formattedAddress || "";
-      const rating  = typeof p.rating === "number" ? p.rating : null;
-      const count   = typeof p.userRatingCount === "number" ? p.userRatingCount : 0;
-      const quality = (rating || 0) * Math.log1p(count);
-      const status  = p.businessStatus || "UNKNOWN";
-      const distance= haversineKm(userLoc, pos);
-      const kwFlag  = hasKW(name) || hasKW(address);
-      return { name, pos, address, rating, count, quality, status, distance, kwFlag };
-    }).filter(Boolean)
-      .filter(x => x.status !== "CLOSED_PERMANENTLY");
-
-    return list.sort((a,b) =>
-      ((b.status === "OPERATIONAL") - (a.status === "OPERATIONAL")) ||
-      (b.kwFlag - a.kwFlag) ||
-      (b.quality - a.quality) ||
-      (a.distance - b.distance)
-    );
+  function rank(userLoc, items){
+    const kw = ["garage","auto","mécanique","mechanic","pneu","brake","frein","muffler","atelier","car repair","auto repair"];
+    const hasKW = s => kw.some(k => (s||"").toLowerCase().includes(k));
+    return (items||[])
+      .map(p=>{
+        const name = placeName(p);
+        const pos = placePos(p);
+        if(!pos) return null;
+        const address = p.formattedAddress || "";
+        const rating = typeof p.rating==="number" ? p.rating : null;
+        const count  = typeof p.userRatingCount==="number" ? p.userRatingCount : 0;
+        const quality= (rating||0) * Math.log1p(count);
+        const status = p.businessStatus || "UNKNOWN";
+        const dist   = km(userLoc,pos);
+        const kwf    = hasKW(name)||hasKW(address);
+        return {name,address,pos,rating,count,quality,status,dist,kwf};
+      })
+      .filter(Boolean)
+      .filter(x => x.status !== "CLOSED_PERMANENTLY")
+      .sort((a,b)=>
+        ((b.status==="OPERATIONAL")-(a.status==="OPERATIONAL")) ||
+        (b.kwf-a.kwf) ||
+        (b.quality-a.quality) ||
+        (a.dist-b.dist)
+      );
   }
 
-  // --- Google Places (New): Nearby ---
-  async function searchNearbyNew(userLoc) {
+  function render(userLoc, items){
+    clearList();
+    const ranked = rank(userLoc, items);
+    if (!ranked.length){ appendMsg("No garages found."); return; }
+    ranked.forEach(x=>{
+      new google.maps.Marker({ position:x.pos, map, title:x.name });
+      const card = document.createElement("div");
+      card.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
+      const link = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.name+" "+(x.address||""))}`;
+      const ratingTxt = x.rating ? `⭐ ${x.rating}/5 (${x.count})` : "No rating";
+      card.innerHTML = `
+        <h3 class="text-lg font-semibold text-blue-700">${x.name}</h3>
+        <p class="text-sm text-gray-700">${x.address || "Address not available"}</p>
+        <p class="text-sm text-gray-700">${ratingTxt}</p>
+        <p class="text-sm text-gray-600">📍 ${x.dist.toFixed(1)} km away</p>
+        <a class="text-blue-600 text-sm hover:underline" target="_blank" href="${link}">Open in Google Maps</a>
+      `;
+      $list().appendChild(card);
+    });
+  }
+
+  // ---------- Places (New) ----------
+  async function nearbyNew(userLoc){
     const { Place, SearchNearbyRankPreference } = await google.maps.importLibrary("places");
-    const center = toLatLng(userLoc);
     const fields = ["id","displayName","location","formattedAddress","rating","userRatingCount","businessStatus","types"];
     const req = {
       fields,
-      // <— IMPORTANT: en "New", c'est locationRestriction: { center: LatLng, radius }
-      locationRestriction: { center, radius: 10000 },
-      includedPrimaryTypes: ["car_repair"],
+      locationRestriction: { center: toLL(userLoc), radius: 10000 },  // 10km
+      includedTypes: ["car_repair"],        // ✅ recommandé
       maxResultCount: 20,
       rankPreference: SearchNearbyRankPreference.DISTANCE
     };
@@ -670,24 +684,20 @@
     return places || [];
   }
 
-  // --- Google Places (New): Text Search (fallback si Nearby vide) ---
-  async function searchTextNew(userLoc) {
+  async function textSearchNew(userLoc){
     const { Place } = await google.maps.importLibrary("places");
-    const center = toLatLng(userLoc);
     const fields = ["id","displayName","location","formattedAddress","rating","userRatingCount","businessStatus","types"];
     const req = {
       fields,
-      textQuery: "car repair OR auto repair OR garage",
-      // <— en Text Search, on utilise locationBias
-      locationBias: { center, radius: 12000 }, // 12 km pour ratisser plus large
+      textQuery: "garage automobile OR auto repair OR car repair",
+      locationBias: { center: toLL(userLoc), radius: 12000 } // plus large
     };
     const { places } = await Place.searchByText(req);
     return places || [];
   }
 
-  // --- OpenStreetMap Overpass (dernier recours) ---
-  async function searchOSM(userLoc) {
-    const url = `https://overpass-api.de/api/interpreter`;
+  // ---------- OSM fallback ----------
+  async function osm(userLoc){
     const q = `
       [out:json][timeout:25];
       (
@@ -696,114 +706,70 @@
         way["amenity"="car_repair"](around:12000,${userLoc.lat},${userLoc.lng});
         way["shop"="car_repair"](around:12000,${userLoc.lat},${userLoc.lng});
       );
-      out center 60;
+      out center 80;
     `;
-    const res = await fetch(url, { method: "POST", body: q, headers: { "Content-Type": "text/plain" } });
+    const res = await fetch("https://overpass-api.de/api/interpreter", {method:"POST", body:q, headers:{"Content-Type":"text/plain"}});
     const data = await res.json();
-    return (data.elements || []).map(el => {
+    return (data.elements||[]).map(el=>{
       const lat = el.lat ?? el.center?.lat, lng = el.lon ?? el.center?.lon;
+      if (typeof lat!=="number" || typeof lng!=="number") return null;
       return {
         displayName: el.tags?.name || "Garage",
         formattedAddress: [el.tags?.addr_housenumber, el.tags?.addr_street, el.tags?.addr_city].filter(Boolean).join(" "),
-        location: (typeof lat === "number" && typeof lng === "number") ? { lat, lng } : null,
-        rating: null, userRatingCount: 0, businessStatus: "UNKNOWN", types: ["car_repair"]
+        location: {lat,lng}, rating:null, userRatingCount:0, businessStatus:"UNKNOWN"
       };
-    }).filter(p => p.location);
+    }).filter(Boolean);
   }
 
-  // --- rendu UI ---
-  function render(userLoc, items) {
-    const list = document.getElementById("garageList");
+  // ---------- Orchestration ----------
+  async function run(userLoc){
     clearList();
-
-    const ranked = normalizeAndRank(userLoc, items);
-
-    if (!ranked.length) {
-      showMsg("No garages found.");
-      return;
-    }
-
-    ranked.forEach(x => {
-      new google.maps.Marker({ position: x.pos, map, title: x.name });
-      const km = x.distance.toFixed(1);
-      const card = document.createElement("div");
-      card.className = "p-4 bg-gray-100 rounded-lg shadow space-y-1";
-      const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.name + " " + (x.address || ""))}`;
-      const ratingTxt = x.rating ? `⭐ ${x.rating}/5 (${x.count})` : "No rating";
-      card.innerHTML = `
-        <h3 class="text-lg font-semibold text-blue-700">${x.name}</h3>
-        <p class="text-sm text-gray-700">${x.address || "Address not available"}</p>
-        <p class="text-sm text-gray-700">${ratingTxt}</p>
-        <p class="text-sm text-gray-600">📍 ${km} km away</p>
-        <a href="${mapLink}" target="_blank" class="text-blue-600 text-sm hover:underline">Open in Google Maps</a>
-      `;
-      list.appendChild(card);
-    });
-  }
-
-  // --- orchestration ---
-  async function run(userLoc) {
-    clearList();
-    try {
-      // 1) Nearby
-      const n = await searchNearbyNew(userLoc);
-      if (n.length) {
-        render(userLoc, n);
-        return;
-      }
-      showMsg("No nearby results from Google. Trying a wider search…");
-
-      // 2) Text Search
-      const t = await searchTextNew(userLoc);
-      if (t.length) {
-        render(userLoc, t);
-        return;
-      }
-      showMsg("No text search results from Google. Trying OpenStreetMap…");
-
-      // 3) OSM
-      const o = await searchOSM(userLoc);
+    appendMsg("Searching nearby garages (Google)…");
+    try{
+      const n = await nearbyNew(userLoc);
+      if (n.length){ render(userLoc, n); return; }
+      appendMsg("No nearby results. Widening search (Google Text Search)…");
+      const t = await textSearchNew(userLoc);
+      if (t.length){ render(userLoc, t); return; }
+      appendMsg("No Google results. Trying OpenStreetMap…");
+      const o = await osm(userLoc);
       render(userLoc, o);
-    } catch (e) {
-      console.error("[Find garages] fatal:", e);
-      showMsg("Could not load nearby places. Check that Places API (New) is enabled for your key.");
+    }catch(e){
+      console.error(e);
+      clearList();
+      appendMsg("Could not load places. Check that Places API (New) is enabled for your key and billing is active.");
     }
   }
 
-  // --- init carte + bouton ---
-  async function initMap() {
+  // ---------- Init + bouton ----------
+  async function initMap(){
     const { Map } = await google.maps.importLibrary("maps");
     map = new Map(document.getElementById("map"), {
       center: { lat: 45.5017, lng: -73.5673 },
-      zoom: 13,
+      zoom: 13
     });
   }
-  window.initMap = initMap; // nécessaire pour le callback du loader
+  window.initMap = initMap;
 
   document.getElementById("findGaragesBtn").addEventListener("click", () => {
     const fallbackPrompt = async () => {
       const input = prompt("Location access denied. Enter your city or postal code:");
       if (!input) return;
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input.trim())}`);
-        const [hit] = await res.json();
-        if (!hit) return showMsg("Could not resolve that location.");
+      try{
+        const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(input.trim())}`);
+        const [hit] = await r.json();
+        if (!hit) { clearList(); appendMsg("Could not resolve that location."); return; }
         const userLoc = { lat: parseFloat(hit.lat), lng: parseFloat(hit.lon) };
         map.setCenter(userLoc);
         run(userLoc);
-      } catch { showMsg("Location lookup failed."); }
+      }catch{ clearList(); appendMsg("Location lookup failed."); }
     };
 
     if (!("geolocation" in navigator)) return fallbackPrompt();
-
     navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        const userLoc = { lat: coords.latitude, lng: coords.longitude };
-        map.setCenter(userLoc);
-        run(userLoc);
-      },
+      ({coords}) => { const u = {lat:coords.latitude, lng:coords.longitude}; map.setCenter(u); run(u); },
       fallbackPrompt,
-      { enableHighAccuracy: true, maximumAge: 15000, timeout: 12000 }
+      { enableHighAccuracy:true, maximumAge:15000, timeout:12000 }
     );
   });
 </script>
@@ -812,6 +778,7 @@
 <script
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBHoVFe6mCVVMCxIG6xcccjLCO4ELPvftU&v=weekly&loading=async&libraries=maps,places&language=fr&region=CA&callback=initMap"
   async defer></script>
+
 
 
 <!-- 🛡️ Consent Banner -->
